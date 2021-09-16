@@ -2,4 +2,5 @@ venv/
 dk-bk.csv
 test.beancount
 .idea/*
-importers/danskebank/__pycache__/*.pyc
+*.pyc
+.DS_Store

@@ -50,6 +50,7 @@ class Importer(importer.ImporterProtocol):
 
                 meta = data.new_metadata(f.name, index)
 
+                # todo: create mapping in elegant way--so I can also map new things quickly
                 destination_account = GetInfo(trans_desc, trans_amt_dec)
 
                 txn = data.Transaction(

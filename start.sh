@@ -1,3 +1,3 @@
-bean-extract config.py /Users/manebjaelke/Documents/personal-finance >> test.beancount
+bean-extract config.py / >> test.beancount
 cat test.beancount
 bean-check example.beancount

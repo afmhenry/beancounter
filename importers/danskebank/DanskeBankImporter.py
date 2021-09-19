@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import sys
 from beancount.core.number import D
 from beancount.ingest import importer
 from beancount.core import account
@@ -7,12 +7,10 @@ from beancount.core import amount
 from beancount.core import flags
 from beancount.core import data
 from beancount.core.position import Cost
-from ..Classifier import  GetInfo
-
+from ..Classifier import get_info, get_category, add_category, get_accounts
 
 from dateutil.parser import parse
 import datetime
-
 
 from titlecase import titlecase
 
@@ -33,17 +31,18 @@ class Importer(importer.ImporterProtocol):
 
     def extract(self, f):
         entries = []
-
-
+        accounts = get_accounts()
+        mapping = get_category()
 
         with open(f.name) as f:
             for _ in range(1):  # first 3 lines are garbage
                 next(f)
 
             for index, row in enumerate(csv.reader(f, delimiter=';')):
+
                 trans_date = datetime.datetime.strptime(row[0], "%d.%m.%Y").strftime("%Y-%m-%d")
                 trans_date = parse(trans_date).date()
-                trans_desc = row[1].replace(")", "")
+                trans_desc = row[1]
                 trans_amt = float(row[2].replace(".", "").replace(",", "."))
                 trans_amt = '{:.2f}'.format(trans_amt)
                 trans_amt_dec = D(trans_amt)
@@ -51,7 +50,12 @@ class Importer(importer.ImporterProtocol):
                 meta = data.new_metadata(f.name, index)
 
                 # todo: create mapping in elegant way--so I can also map new things quickly
-                destination_account = GetInfo(trans_desc, trans_amt_dec)
+                if trans_desc not in mapping:
+                    # prompt input for classification
+                    mapping = add_category(trans_desc, trans_amt, trans_date, mapping, accounts)
+
+
+                destination_account = get_info(trans_amt_dec)
 
                 txn = data.Transaction(
                     meta=meta,
@@ -66,12 +70,17 @@ class Importer(importer.ImporterProtocol):
 
                 txn.postings.append(
                     data.Posting(self.source_account, amount.Amount(D(trans_amt),
-                                                             'DKK'), None, None, None, None)
+                                                                    'DKK'), None, None, None, None)
                 )
                 txn.postings.append(
-                    data.Posting(destination_account, amount.Amount(D(trans_amt_dec *-1),
-                                                             'DKK'), None, None, None, None)
+                    data.Posting(destination_account, amount.Amount(D(trans_amt_dec * -1),
+                                                                    'DKK'), None, None, None, None)
                 )
-                entries.append(txn)
+                if index == 2:
+                    balance = float(row[3].replace(".", "").replace(",", "."))
+                    # txn.postings.append(data.Balance(meta, trans_date, self.source_account, amount.Amount(D(
+                    # balance), 'DKK'), None, None))
+
+                # entries.append(txn)
 
         return entries

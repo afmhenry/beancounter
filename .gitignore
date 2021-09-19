@@ -4,3 +4,4 @@ test.beancount
 .idea/*
 *.pyc
 .DS_Store
+example.beancount

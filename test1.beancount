@@ -1,0 +1,42 @@
+2020-01-01 open Equity:Opening-Balance DKK,USD
+2020-01-01 open Assets:DanskeBank:Checking DKK
+2020-01-01 open Equity:Danica DKK
+2020-01-01 open Equity:Saxo:ASK DKK
+2020-01-01 open Equity:NordNet:Depot DKK
+2020-01-01 open Assets:Schwab:Checking USD
+2020-01-01 open Equity:Schwab:Brokerage USD
+
+2020-01-01 event "employer" "Agillic"
+
+2020-01-01 open Income:Agillic:Salary
+2020-01-01 open Income:Agillic:Vacation-Bonus
+2020-01-01 open Income:MobilePay
+;2020-01-01 open Income:Investment:Dividends
+;2020-01-01 open Income:Investment:PnL
+
+2020-01-01 open Expenses:MobilePay
+2020-01-01 open Expenses:Investment:ASK
+2020-01-01 open Expenses:Investment:Depot
+
+2020-01-01 open Expenses:Housing:Rent
+2020-01-01 open Expenses:Housing:Utilities
+2020-01-01 open Expenses:Housing:Maintenance
+2020-01-01 open Expenses:Housing:Insurance
+
+2020-01-01 open Expenses:Consumption:Grocery
+2020-01-01 open Expenses:Consumption:Outings
+2020-01-01 open Expenses:Consumption:Vacation
+
+2020-01-01 pad Assets:DanskeBank:Checking Equity:Opening-Balance
+2020-01-01 pad Equity:Danica Equity:Opening-Balance
+2020-01-01 pad Equity:Saxo:ASK Equity:Opening-Balance
+2020-01-01 pad Equity:NordNet:Depot Equity:Opening-Balance
+2020-01-01 pad Equity:Schwab:Brokerage Equity:Opening-Balance
+2020-01-01 pad Assets:Schwab:Checking Equity:Opening-Balance
+
+2020-01-02 balance Assets:DanskeBank:Checking 200000.00 DKK
+2020-01-02 balance Equity:Danica 100000.00 DKK
+2020-01-02 balance Equity:NordNet:Depot 100000.00 DKK
+2020-01-02 balance Equity:Saxo:ASK 100000.00 DKK
+2020-01-02 balance Assets:Schwab:Checking 10000.00 USD
+2020-01-02 balance Equity:Schwab:Brokerage 10000.00 USD

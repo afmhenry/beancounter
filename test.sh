@@ -1,0 +1,1 @@
+bean-extract config.py ~/Documents/beancounter

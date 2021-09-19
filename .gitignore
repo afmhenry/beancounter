@@ -1,6 +1,8 @@
 venv/
 dk-bk.csv
 test.beancount
+test1.beancount
 .idea/*
 *.pyc
 .DS_Store
+example.beancount

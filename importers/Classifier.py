@@ -3,7 +3,7 @@ import json
 
 def get_accounts():
     accounts = []
-    with open('test1.beancount') as f:
+    with open('accounts.beancount') as f:
         for line in f:
             if "open" in line:
                 line = line.split(" ")
@@ -20,13 +20,8 @@ def get_category():
 def add_category(description, cost, date, purchase_mapping, account_mapping):
     loop = 0
     while loop == 0:
-        print("The description:")
-        print(description)
-        print("with cost: ")
-        print(cost)
-        print("on date: ")
-        print(date)
-        print(": is not mapped. Please provide mapping to existing account.\n")
+        print("The description:"+description+" with cost: "+cost+"on date: "+str(date) +
+              ": is not mapped. Please provide mapping to existing account.")
         print(account_mapping)
 
         user_input = input("--> ")

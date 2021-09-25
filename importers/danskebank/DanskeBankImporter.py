@@ -7,7 +7,7 @@ from beancount.core import amount
 from beancount.core import flags
 from beancount.core import data
 from beancount.core.position import Cost
-from ..Classifier import get_info, get_category, add_category, get_accounts
+from ..Classifier import get_categories, add_category, get_accounts
 
 from dateutil.parser import parse
 import datetime
@@ -32,7 +32,7 @@ class Importer(importer.ImporterProtocol):
     def extract(self, f):
         entries = []
         accounts = get_accounts()
-        mapping = get_category()
+        mapping = get_categories()
 
         with open(f.name) as f:
             for _ in range(1):  # first 3 lines are garbage
@@ -54,8 +54,7 @@ class Importer(importer.ImporterProtocol):
                     # prompt input for classification
                     mapping = add_category(trans_desc, trans_amt, trans_date, mapping, accounts)
 
-
-                destination_account = get_info(trans_amt_dec)
+                destination_account = mapping[trans_desc]
 
                 txn = data.Transaction(
                     meta=meta,

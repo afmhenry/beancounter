@@ -1,1 +1,0 @@
-fava test.beancount

@@ -7,7 +7,7 @@ from beancount.core import amount
 from beancount.core import flags
 from beancount.core import data
 from beancount.core.position import Cost
-from ..Classifier import get_categories, add_category, get_accounts
+from ..Classifier import *
 
 from dateutil.parser import parse
 import datetime
@@ -32,10 +32,13 @@ class Importer(importer.ImporterProtocol):
     def extract(self, f):
         entries = []
         accounts = get_accounts()
+        account_by_type = split_acc_types(accounts)
+
         mapping = get_categories()
+        root = setup_window()
 
         with open(f.name) as f:
-            for _ in range(1):  # first 3 lines are garbage
+            for _ in range(1):  # first line has headers
                 next(f)
 
             for index, row in enumerate(csv.reader(f, delimiter=';')):
@@ -52,7 +55,8 @@ class Importer(importer.ImporterProtocol):
                 # todo: create mapping in elegant way--so I can also map new things quickly
                 if trans_desc not in mapping:
                     # prompt input for classification
-                    mapping = add_category(trans_desc, trans_amt, trans_date, mapping, accounts)
+                    mapping = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
+                                            account_by_type[1])
 
                 destination_account = mapping[trans_desc]
 

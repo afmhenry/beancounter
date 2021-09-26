@@ -1,1 +1,1 @@
-bean-extract config.py ~/Documents/beancounter
+bean-extract config.py mapping-private.json ~/Documents/beancounter

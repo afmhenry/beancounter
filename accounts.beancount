@@ -1,17 +1,25 @@
-2020-01-01 open Income:Agillic:Salary
-2020-01-01 open Income:Agillic:Vacation-Bonus
+2020-01-01 open Income:Work:Salary
+2020-01-01 open Income:Work:Bonus
 2020-01-01 open Income:MobilePay
+2020-01-01 open Income:Refund
+
+2020-01-01 open Expenses:Consumption:Grocery
+2020-01-01 open Expenses:Consumption:EatingOut
+2020-01-01 open Expenses:Consumption:Activities
+2020-01-01 open Expenses:Consumption:Hygiene
+2020-01-01 open Expenses:Consumption:Transport
+2020-01-01 open Expenses:Consumption:Vacation
 
 2020-01-01 open Expenses:MobilePay
-2020-01-01 open Expenses:Investment:ASK
-2020-01-01 open Expenses:Investment:Depot
 
 2020-01-01 open Expenses:Housing:Rent
 2020-01-01 open Expenses:Housing:Utilities
 2020-01-01 open Expenses:Housing:Maintenance
-2020-01-01 open Expenses:Housing:Insurance
 
-2020-01-01 open Expenses:Consumption:Grocery
-2020-01-01 open Expenses:Consumption:Care
-2020-01-01 open Expenses:Consumption:Outings
-2020-01-01 open Expenses:Consumption:Vacation
+2020-01-01 open Expenses:Subscription:Mobile
+2020-01-01 open Expenses:Subscription:Insurance
+2020-01-01 open Expenses:Subscription:Other
+
+2020-01-01 open Expenses:Investment:ASK
+2020-01-01 open Expenses:Investment:Depot
+2020-01-01 open Expenses:Tax

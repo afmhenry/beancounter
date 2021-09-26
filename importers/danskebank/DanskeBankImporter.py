@@ -54,7 +54,6 @@ class Importer(importer.ImporterProtocol):
 
                 # todo: create mapping in elegant way--so I can also map new things quickly
                 if trans_desc not in mapping:
-                    # prompt input for classification
                     mapping = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
                                             account_by_type[1])
 

@@ -7,6 +7,7 @@
 2020-01-01 open Expenses:Consumption:EatingOut
 2020-01-01 open Expenses:Consumption:Activities
 2020-01-01 open Expenses:Consumption:Hygiene
+2020-01-01 open Expenses:Consumption:Clothes
 2020-01-01 open Expenses:Consumption:Transport
 2020-01-01 open Expenses:Consumption:Vacation
 
@@ -15,6 +16,7 @@
 2020-01-01 open Expenses:Housing:Rent
 2020-01-01 open Expenses:Housing:Utilities
 2020-01-01 open Expenses:Housing:Maintenance
+2020-01-01 open Expenses:Housing:Household
 
 2020-01-01 open Expenses:Subscription:Mobile
 2020-01-01 open Expenses:Subscription:Insurance

@@ -5,7 +5,7 @@ import sys
 
 def get_accounts():
     accounts = []
-    with open('accounts.beancount') as f:
+    with open(sys.argv[3]) as f:
         for line in f:
             if "open" in line:
                 line = line.split(" ")
@@ -31,11 +31,7 @@ def split_acc_types(account_mapping):
 
 
 def setup_window():
-    # Tkinter
-    # Create object
     root = tk.Tk()
-
-    # Adjust size
     root.geometry("200x200")
 
     return root
@@ -49,9 +45,8 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
 
     def show():
         add_category(description, clicked.get(), purchase_mapping)
+        # black magic to make the dropdown die.
         for child in root.winfo_children():
-            print((type(child)))
-            print(child.__class__.__name__)
             if str(child.__class__.__name__) == "OptionMenu":
                 child.destroy()
         root.quit()
@@ -70,10 +65,9 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
 
     button = tk.Button(root, name="continue", text="Select", command=show, width=30)
     button.pack()
-
-    # Execute tkinter
     root.mainloop()
-    # print(purchase_mapping)
+
+    # todo need to make sure this actually is updated...or at least understand how.
     return purchase_mapping
 
 

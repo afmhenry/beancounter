@@ -1,9 +1,8 @@
 venv/
-dk-bk.csv
-test.beancount
-test1.beancount
-mapping-private.json
+beans/test.beancount
+data/mapping-private.json
 .idea/*
 *.pyc
 .DS_Store
-example.beancount
+beans/example.beancount
+*.csv

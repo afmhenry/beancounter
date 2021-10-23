@@ -19,7 +19,8 @@ def get_categories():
         return mapping
 
 
-def split_acc_types(account_mapping):
+def split_acc_types():
+    account_mapping = get_accounts()
     expense_mapping = []
     income_mapping = []
     for acct in account_mapping:
@@ -32,7 +33,7 @@ def split_acc_types(account_mapping):
 
 def setup_window():
     root = tk.Tk()
-    root.geometry("200x200")
+    root.geometry("400x400")
 
     return root
 
@@ -44,7 +45,11 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
         account_mapping = income_mapping
 
     def show():
-        add_category(description, clicked.get(), purchase_mapping)
+        account = clicked.get()
+        nonlocal description
+        description = exceptions(description, account)
+        print("in show" + description)
+        add_category(description, account, purchase_mapping)
         # black magic to make the dropdown die.
         for child in root.winfo_children():
             if str(child.__class__.__name__) == "OptionMenu":
@@ -68,7 +73,21 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
     root.mainloop()
 
     # todo need to make sure this actually is updated...or at least understand how.
-    return purchase_mapping
+    print("in format" +description)
+    return purchase_mapping, description
+
+
+def exceptions(description, account):
+
+    recurring_but_different = ["awg"] #["MobilePay", "Automatudbetaling"]
+    for value in recurring_but_different:
+        if value in description:
+            split_acc = account.split(":")
+            periods = len(account.split(":"))
+            description = description + ": " + split_acc[periods-1]
+            break
+
+    return description
 
 
 def add_category(description, account, purchase_mapping):

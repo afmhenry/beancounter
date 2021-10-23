@@ -1,1 +1,1 @@
-fava ~/Documents/beancounter/test.beancount
+fava ~/Documents/beancounter/beans/test.beancount

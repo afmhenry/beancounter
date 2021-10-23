@@ -26,18 +26,16 @@ class Importer(importer.ImporterProtocol):
         self.source_account = source_account
 
     def identify(self, f):
-        # Main--20211010
-        # (Main)[-][0-9]{10}[-][0-9]{8}
         if re.search("(Main)[-][0-9]{10}[-][0-9]{8}", os.path.basename(f.name)):
-            if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
-                return True
+            return True
+            # if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
+            #    return True
         else:
             return False
 
     def extract(self, f):
         entries = []
-        accounts = get_accounts()
-        account_by_type = split_acc_types(accounts)
+        account_by_type = split_acc_types()
 
         mapping = get_categories()
         root = setup_window()
@@ -61,10 +59,12 @@ class Importer(importer.ImporterProtocol):
 
                     # todo: create mapping in elegant way--so I can also map new things quickly
                     if trans_desc not in mapping:
-                        mapping = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
-                                                account_by_type[1])
-
-                    destination_account = mapping[trans_desc]
+                        mappings = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
+                                                 account_by_type[1])
+                        destination_account = mappings[0][mappings[1]]
+                        mapping = mappings[0]
+                    else:
+                        destination_account = mapping[trans_desc]
 
                     txn = data.Transaction(
                         meta=meta,
@@ -91,8 +91,7 @@ class Importer(importer.ImporterProtocol):
                         # balance), 'DKK'), None, None))
 
                     entries.append(txn)
-                else:
-                    print("Pending purchases")
+                # else pending purchases, will get them next time.
             if index:
                 entries.append(
                     data.Balance(meta, trans_date,

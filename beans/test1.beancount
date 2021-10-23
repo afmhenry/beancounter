@@ -6,70 +6,36 @@
 2020-01-01 open Assets:Schwab:Checking USD
 2020-01-01 open Equity:Schwab:Brokerage USD
 
-2020-01-01 event "employer" "Agillic"
+2020-01-01 open Expenses:Consumption:Grocery DKK
+2020-01-01 open Expenses:Consumption:EatingOut DKK
+2020-01-01 open Expenses:Consumption:Activities DKK
+2020-01-01 open Expenses:Consumption:Health DKK
+2020-01-01 open Expenses:Consumption:Clothes DKK
+2020-01-01 open Expenses:Consumption:Transport DKK
+2020-01-01 open Expenses:Consumption:Vacation DKK
+2020-01-01 open Expenses:Consumption:Gifts DKK
+2020-01-01 open Expenses:Consumption:Other DKK
 
-2020-01-01 open Income:Agillic:Salary
-2020-01-01 open Income:Agillic:Vacation-Bonus
-2020-01-01 open Income:MobilePay
-;2020-01-01 open Income:Investment:Dividends
-;2020-01-01 open Income:Investment:PnL
+2020-01-01 open Expenses:MobilePay DKK
 
-2020-01-01 open Expenses:MobilePay
-2020-01-01 open Expenses:Investment:ASK
-2020-01-01 open Expenses:Investment:Depot
+2020-01-01 open Expenses:Housing:Rent DKK
+2020-01-01 open Expenses:Housing:Utilities DKK
+2020-01-01 open Expenses:Housing:Maintenance DKK
+2020-01-01 open Expenses:Housing:Household DKK
 
-2020-01-01 open Expenses:Housing:Rent
-2020-01-01 open Expenses:Housing:Utilities
-2020-01-01 open Expenses:Housing:Maintenance
-2020-01-01 open Expenses:Housing:Insurance
-
-2020-01-01 open Expenses:Consumption:Grocery
-2020-01-01 open Expenses:Consumption:Outings
-2020-01-01 open Expenses:Consumption:Vacation
-
-2020-01-01 pad Assets:DanskeBank:Checking Equity:Opening-Balance
-2020-01-01 pad Equity:Danica Equity:Opening-Balance
-2020-01-01 pad Equity:Saxo:ASK Equity:Opening-Balance
-2020-01-01 pad Equity:NordNet:Depot Equity:Opening-Balance
-2020-01-01 pad Equity:Schwab:Brokerage Equity:Opening-Balance
-2020-01-01 pad Assets:Schwab:Checking Equity:Opening-Balance
-
-2020-01-02 balance Assets:DanskeBank:Checking 200000.00 DKK
-2020-01-02 balance Equity:Danica 100000.00 DKK
-2020-01-02 balance Equity:NordNet:Depot 100000.00 DKK
-2020-01-02 balance Equity:Saxo:ASK 100000.00 DKK
-2020-01-02 balance Assets:Schwab:Checking 10000.00 USD
-2020-01-02 balance Equity:Schwab:Brokerage 10000.00 USD
-
-
-2020-01-01 open Income:Work:Salary
-2020-01-01 open Income:Work:Bonus
-2020-01-01 open Income:MobilePay
-2020-01-01 open Income:Refund
-2020-01-01 open Income:Interest
-
-2020-01-01 open Expenses:Consumption:Grocery
-2020-01-01 open Expenses:Consumption:EatingOut
-2020-01-01 open Expenses:Consumption:Activities
-2020-01-01 open Expenses:Consumption:Health
-2020-01-01 open Expenses:Consumption:Clothes
-2020-01-01 open Expenses:Consumption:Transport
-2020-01-01 open Expenses:Consumption:Vacation
-2020-01-01 open Expenses:Consumption:Gifts
-2020-01-01 open Expenses:Consumption:Other
-
-2020-01-01 open Expenses:MobilePay
-
-2020-01-01 open Expenses:Housing:Rent
-2020-01-01 open Expenses:Housing:Utilities
-2020-01-01 open Expenses:Housing:Maintenance
-2020-01-01 open Expenses:Housing:Household
-
-2020-01-01 open Expenses:Subscription:Mobile
-2020-01-01 open Expenses:Subscription:Insurance
-2020-01-01 open Expenses:Subscription:Other
+2020-01-01 open Expenses:Subscription:Mobile DKK
+2020-01-01 open Expenses:Subscription:Insurance DKK
+2020-01-01 open Expenses:Subscription:Other DKK
 
 2020-01-01 open Expenses:Investment:ASK
 2020-01-01 open Expenses:Investment:Depot
 2020-01-01 open Expenses:Tax
 2020-01-01 open Expenses:Interest
+
+2020-01-01 open Income:Work:Salary DKK
+2020-01-01 open Income:Work:Bonus DKK
+2020-01-01 open Income:MobilePay DKK
+2020-01-01 open Income:Refund DKK
+2020-01-01 open Income:Interest DKK
+
+2020-01-01 event "employer" "Agillic"

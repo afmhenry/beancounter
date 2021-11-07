@@ -58,13 +58,14 @@ class Importer(importer.ImporterProtocol):
                     meta = data.new_metadata(f.name, index)
 
                     # todo: create mapping in elegant way--so I can also map new things quickly
-                    if trans_desc not in mapping:
+                    trans_desc = modify_if_in_exceptions(trans_desc, trans_date.strftime("%d-%m-%Y"))
+                    if trans_desc in mapping:
+                        destination_account = mapping[trans_desc]
+                    else:
                         mappings = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
                                                  account_by_type[1])
                         destination_account = mappings[0][mappings[1]]
                         mapping = mappings[0]
-                    else:
-                        destination_account = mapping[trans_desc]
 
                     txn = data.Transaction(
                         meta=meta,
@@ -85,16 +86,23 @@ class Importer(importer.ImporterProtocol):
                         data.Posting(destination_account, amount.Amount(D(trans_amt_dec * -1),
                                                                         'DKK'), None, None, None, None)
                     )
-                    if index == 2:
-                        balance = float(row[3].replace(".", "").replace(",", "."))
-                        # txn.postings.append(data.Balance(meta, trans_date, self.source_account, amount.Amount(D(
-                        # balance), 'DKK'), None, None))
 
+                    # at start of file balance
+                    if index == 0:
+                        entries.append(
+                            # have to apply on day before, balance is date dependent and not based on order
+                            data.Balance(meta, trans_date+datetime.timedelta(days=-1),
+                                         self.source_account,
+                                         # must subtract initial cost to have "before" picture
+                                         # might cause issues if there are close dates...we will find out.
+                                         amount.Amount(balance_amt_dec+trans_amt_dec * -1, 'DKK'), None, None))
                     entries.append(txn)
-                # else pending purchases, will get them next time.
-            if index:
-                entries.append(
-                    data.Balance(meta, trans_date,
-                                 self.source_account,
-                                 amount.Amount(balance_amt_dec, 'DKK'), None, None))
+
+                # else pending purchases, will get them next file when they are ready.
+
+            # At end of file, balance
+            entries.append(
+                data.Balance(meta, trans_date+datetime.timedelta(days=1),
+                             self.source_account,
+                             amount.Amount(balance_amt_dec, 'DKK'), None, None))
         return entries

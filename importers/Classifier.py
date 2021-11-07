@@ -39,18 +39,15 @@ def setup_window():
 
 
 def format_window(root, description, cost, date, purchase_mapping, expense_mapping, income_mapping):
-    # split map into sections
-    account_mapping = expense_mapping
-    if float(cost) > 0:
-        account_mapping = income_mapping
 
-    def show():
-        account = clicked.get()
-        nonlocal description
-        description = exceptions(description, account)
-        print("in show" + description)
+    def getInput():
+        account = clicked1.get()
+        if account == "Expenses":
+            account = clicked2.get()
+        # nonlocal description
+        # description = exceptions(description, account)
         add_category(description, account, purchase_mapping)
-        # black magic to make the dropdown die.
+        # black magic to make the dropdowns die.
         for child in root.winfo_children():
             if str(child.__class__.__name__) == "OptionMenu":
                 child.destroy()
@@ -63,23 +60,42 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
                      height=6
                      )
     label.pack()
-    clicked = tk.StringVar()
-    clicked.set(account_mapping[0])
-    drop = tk.OptionMenu(root, clicked, *account_mapping)
-    drop.pack()
+    clicked1 = tk.StringVar()
+    clicked1.set("Expenses")
+    drop1 = tk.OptionMenu(root, clicked1, *expense_mapping)
+    drop1.pack()
 
-    button = tk.Button(root, name="continue", text="Select", command=show, width=30)
+    clicked2 = tk.StringVar()
+    clicked2.set("Income")
+    drop2 = tk.OptionMenu(root, clicked2, *income_mapping)
+    drop2.pack()
+
+    button = tk.Button(root, name="continue", text="Select", command=getInput, width=30)
     button.pack()
     root.mainloop()
 
     # todo need to make sure this actually is updated...or at least understand how.
-    print("in format" +description)
     return purchase_mapping, description
 
 
-def exceptions(description, account):
+def get_exceptions():
+    with open(sys.argv[4]) as f:
+        mapping = json.load(f)
+        return mapping
 
-    recurring_but_different = ["awg"] #["MobilePay", "Automatudbetaling"]
+
+def modify_if_in_exceptions(description, date):
+    exception_list = get_exceptions()
+    for value in exception_list:
+        if value in description:
+            return description+" "+date
+        else:
+            return description
+
+
+def exceptions(description, account):
+    recurring_but_different = get_exceptions()
+
     for value in recurring_but_different:
         if value in description:
             split_acc = account.split(":")

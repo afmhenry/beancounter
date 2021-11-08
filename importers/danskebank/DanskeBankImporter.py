@@ -3,11 +3,9 @@ import sys
 import re
 from beancount.core.number import D
 from beancount.ingest import importer
-from beancount.core import account
 from beancount.core import amount
 from beancount.core import flags
 from beancount.core import data
-from beancount.core.position import Cost
 from ..Classifier import *
 
 from datetime import date
@@ -22,14 +20,13 @@ import re
 
 
 class Importer(importer.ImporterProtocol):
-    def __init__(self, source_account):
-        self.source_account = source_account
+    def __init__(self, account):
+        self.account = account
 
     def identify(self, f):
         if re.search("(Main)[-][0-9]{10}[-][0-9]{8}", os.path.basename(f.name)):
-            return True
-            # if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
-            #    return True
+            if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
+                return True
         else:
             return False
 
@@ -79,7 +76,7 @@ class Importer(importer.ImporterProtocol):
                     )
 
                     txn.postings.append(
-                        data.Posting(self.source_account, amount.Amount(D(trans_amt),
+                        data.Posting(self.account, amount.Amount(D(trans_amt),
                                                                         'DKK'), None, None, None, None)
                     )
                     txn.postings.append(
@@ -91,8 +88,8 @@ class Importer(importer.ImporterProtocol):
                     if index == 0:
                         entries.append(
                             # have to apply on day before, balance is date dependent and not based on order
-                            data.Balance(meta, trans_date+datetime.timedelta(days=-1),
-                                         self.source_account,
+                            data.Balance(meta, trans_date + datetime.timedelta(days=-1),
+                                         self.account,
                                          # must subtract initial cost to have "before" picture
                                          # might cause issues if there are close dates...we will find out.
                                          amount.Amount(balance_amt_dec+trans_amt_dec * -1, 'DKK'), None, None))
@@ -102,7 +99,7 @@ class Importer(importer.ImporterProtocol):
 
             # At end of file, balance
             entries.append(
-                data.Balance(meta, trans_date+datetime.timedelta(days=1),
-                             self.source_account,
+                data.Balance(meta, trans_date + datetime.timedelta(days=1),
+                             self.account,
                              amount.Amount(balance_amt_dec, 'DKK'), None, None))
         return entries

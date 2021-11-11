@@ -49,14 +49,19 @@ class Importer(importer.ImporterProtocol):
                 total_before_commission = floatToString(-1 * currency_modifier * share_amount * float(cost_per_share))
                 commission = stringToFloatString(row[25])
                 transaction_text = row[21]
+                trans_entity = row[7]
                 meta = data.new_metadata(f.name, index)
+                narration = trans_type + ":"+trans_entity
+
+                if transaction_text != "":
+                    narration += ":"+transaction_text
 
                 txn = data.Transaction(
                     meta=meta,
                     date=trans_date,
                     flag=flags.FLAG_OKAY,
                     payee=trans_type + "-" + ticker,
-                    narration="foo",
+                    narration=narration,
                     tags=set(),
                     links=set(),
                     postings=[],
@@ -67,7 +72,8 @@ class Importer(importer.ImporterProtocol):
                     txn.postings.append(
                         data.Posting(destination_account, amount.Amount(D(share_amount),
                                                                         ticker), Cost(D(cost_per_share),
-                                                                                      currency, trans_date, None), None, None, None)
+                                                                                      currency, trans_date, None), None,
+                                     None, None)
                     )
                     # minus cash it cost
                     txn.postings.append(
@@ -77,10 +83,17 @@ class Importer(importer.ImporterProtocol):
                     # minus commission
                     if float(commission) > 0:
                         txn.postings.append(
-                            data.Posting(self.account, amount.Amount(D(commission)*-1,
-                                                                     currency), None, None, None, None)
+                            data.Posting("Expenses:Trading:Commissions", amount.Amount(D(commission) * -1,
+                                                                                       currency), None, None, None,
+                                         None)
                         )
-                    entries.append(txn)
+                elif trans_type == "":
+                    # SOLGT,UDBYTTESKAT, UDB. to be handled
+                    print()
+                entries.append(txn)
+
+            #somehow apply balance
+
                 # date format: 2021-10-15
                 # currency format: 1.447,32
 

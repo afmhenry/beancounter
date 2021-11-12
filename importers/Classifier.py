@@ -7,9 +7,11 @@ def get_accounts():
     accounts = []
     with open(sys.argv[3]) as f:
         for line in f:
-            if "open" in line:
+            if " open " in line and "Equity" not in line:
                 line = line.split(" ")
                 accounts.append(line[2].replace("\n", ""))
+            elif line == ";; -*- mode: beancount -*-":
+                break
     return accounts
 
 
@@ -46,7 +48,7 @@ def format_window(root, description, cost, date, purchase_mapping, expense_mappi
             account = clicked2.get()
         # nonlocal description
         # description = exceptions(description, account)
-        add_category(description, account, purchase_mapping)
+        add_category_mapping(description, account, purchase_mapping)
         # black magic to make the dropdowns die.
         for child in root.winfo_children():
             if str(child.__class__.__name__) == "OptionMenu":
@@ -106,7 +108,7 @@ def exceptions(description, account):
     return description
 
 
-def add_category(description, account, purchase_mapping):
+def add_category_mapping(description, account, purchase_mapping):
 
     purchase_mapping[description] = account
 

@@ -1,4 +1,15 @@
 # might try to make common helper functions here
+from decimal import Decimal
+
+
+
+
+def stringToDecimal(str_num):
+    if str_num is not '':
+        return Decimal(str_num.replace(".", "").replace(",", "."))
+    else:
+        return Decimal("0")
+
 
 def stringToFloatString(str_num):
     if str_num is not '':

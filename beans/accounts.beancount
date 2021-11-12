@@ -27,16 +27,12 @@
 2020-01-01 open Expenses:Subscription:Insurance
 2020-01-01 open Expenses:Subscription:Other
 
-
-
-2020-01-01 open Expenses:Trading:Commissions
-
-
 2020-01-01 open Assets:Investment:SaxoBank:ASK:Cash
 2020-01-01 open Assets:Investment:SaxoBank:Depot:Cash
 
 2020-01-01 open Assets:Investment:Nordnet:Depot:Cash
-2020-01-01 open Income:Investment:Nordnet:PnL
+2020-01-01 open Income:Investment:Nordnet:PnL:Sales
+2020-01-01 open Income:Investment:Nordnet:PnL:Dividends
 
 2020-01-01 open Expenses:Tax
 2020-01-01 open Expenses:Interest

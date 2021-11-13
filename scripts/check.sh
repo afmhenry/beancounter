@@ -1,1 +1,1 @@
-bean-check ~/Documents/beancounter/beans/test.beancount
+bean-check ~/Documents/beancounter/beans/alex.beancount

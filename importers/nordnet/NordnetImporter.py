@@ -179,8 +179,8 @@ class Importer(importer.ImporterProtocol):
                         temp_dividend_2
                     )
                     entries.append(txn)
-
-                elif trans_type == "ewew" and transaction_text.split(" ")[0] == "SPLIT" and "OLD" not in ticker:
+                # TODO: Cannot figure out how to split/sell on several purchases differing cost basis yet
+                elif trans_type == "TODO" and transaction_text.split(" ")[0] == "SPLIT" and "OLD" not in ticker:
                     split_ratio_0 = stringToDecimal(transaction_text.split(" ")[1].split(":")[0])
                     split_ratio_1 = stringToDecimal(transaction_text.split(" ")[1].split(":")[1])
                     old_amount_of_shares = amount_of_shares

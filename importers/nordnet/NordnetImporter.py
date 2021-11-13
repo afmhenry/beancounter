@@ -3,7 +3,7 @@ import sys
 import re
 from beancount.core.number import D
 from beancount.ingest import importer
-from beancount.core import amount, account
+from beancount.core import amount, account, position
 from beancount.core import flags
 from beancount.core import data, inventory
 from ..CommonImporter import *
@@ -37,6 +37,12 @@ class Importer(importer.ImporterProtocol):
         else:
             return False
 
+    def file_name(self, f):
+        return 'Nordnet-Depot-Transactions.csv'
+
+    def file_account(self, _):
+        return self.source_account.replace(":Depot:Cash", "")
+
     def extract(self, f):
         entries = []
         known_accounts = get_accounts()
@@ -53,7 +59,7 @@ class Importer(importer.ImporterProtocol):
                 cash_delta = stringToDecimal(row[14])
                 result_of_sale = stringToDecimal(row[17])
                 cash_holdings_dkk = stringToDecimal(row[19])
-                ticker = row[6]
+                ticker = row[6].split(" ")[0]
                 amount_of_shares = stringToDecimal(row[9])
                 cost_per_share = round(stringToDecimal(row[10]) * currency_modifier, 2)
                 total_before_commission = round(amount_of_shares * cost_per_share, 2)
@@ -91,7 +97,8 @@ class Importer(importer.ImporterProtocol):
                                       )
                         )
                         known_accounts.append(destination_account)
-
+                    inventory.Position(amount.Amount(D(amount_of_shares), ticker),
+                                       Cost(D(cost_per_share), currency, trans_date, None))
                     txn.postings.append(
                         data.Posting(destination_account,
                                      amount.Amount(D(amount_of_shares), ticker),
@@ -114,7 +121,7 @@ class Importer(importer.ImporterProtocol):
                     entries.append(txn)
                 elif trans_type == "SOLGT":
                     # determine original cost based on profit
-                    cost_basis = round((total_before_commission - result_of_sale + commission) / amount_of_shares, 2)
+                    cost_basis = round((cash_delta - result_of_sale - commission) / amount_of_shares, 2)
                     # make posting buying stock ticker as currency
                     destination_account = self.source_account.replace("Cash", ticker)
                     txn.postings.append(
@@ -144,12 +151,18 @@ class Importer(importer.ImporterProtocol):
                     )
                     entries.append(txn)
                 elif trans_type == "UDB.":
+                    dividend_meta_info = {
+                        "calculation": "{" +
+                                       str(amount_of_shares) + " " + ticker +
+                                       "} @ " +
+                                       str(cost_per_share) + " " + currency
+                    }
                     temp_dividend_0 = data.Posting(self.dividends_account,
                                                    amount.Amount(total_before_commission * -1, currency),
-                                                   CostSpec(D(amount_of_shares), None, ticker, None, None, None),
-                                                   amount.Amount(cost_per_share, currency),
-                                                   None, None)
-
+                                                   None,
+                                                   None,
+                                                   None,
+                                                   dividend_meta_info)
                     temp_dividend_2 = data.Posting(self.source_account, None,
                                                    None, None, None, None)
 
@@ -167,7 +180,7 @@ class Importer(importer.ImporterProtocol):
                     )
                     entries.append(txn)
 
-                elif trans_type == "" and transaction_text.split(" ")[0] == "SPLIT" and "OLD" not in ticker:
+                elif trans_type == "ewew" and transaction_text.split(" ")[0] == "SPLIT" and "OLD" not in ticker:
                     split_ratio_0 = stringToDecimal(transaction_text.split(" ")[1].split(":")[0])
                     split_ratio_1 = stringToDecimal(transaction_text.split(" ")[1].split(":")[1])
                     old_amount_of_shares = amount_of_shares

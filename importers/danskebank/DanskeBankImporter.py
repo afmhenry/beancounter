@@ -25,10 +25,16 @@ class Importer(importer.ImporterProtocol):
 
     def identify(self, f):
         if re.search("(Main)[-][0-9]{10}[-][0-9]{8}", os.path.basename(f.name)):
-            if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
-                return True
+            #if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
+            return True
         else:
             return False
+
+    def file_name(self, f):
+        return 'Danske-Bank-Checking.csv'
+
+    def file_account(self, _):
+        return self.account
 
     def extract(self, f):
         entries = []

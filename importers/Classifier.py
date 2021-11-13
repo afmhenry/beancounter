@@ -10,8 +10,6 @@ def get_accounts():
             if " open " in line and "Equity" not in line:
                 line = line.split(" ")
                 accounts.append(line[2].replace("\n", ""))
-            elif line == ";; -*- mode: beancount -*-":
-                break
     return accounts
 
 

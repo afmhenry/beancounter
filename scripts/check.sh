@@ -1,0 +1,1 @@
+bean-check ~/Documents/beancounter/beans/test.beancount

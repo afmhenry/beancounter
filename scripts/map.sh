@@ -1,1 +1,1 @@
-bean-extract ~/Documents/beancounter/config.py ~/Documents/beancounter/data/mapping-private.json ~/Documents/beancounter/beans/accounts.beancount ~/Documents/beancounter/data/exceptions.json ~/Documents/beancounter
+bean-extract ~/Documents/beancounter/config.py ~/Documents/beancounter/data/mapping-private.json ~/Documents/beancounter/beans/alex.beancount ~/Documents/beancounter/data/exceptions.json ~/Documents/beancounter

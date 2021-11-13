@@ -1,3 +1,4 @@
+;; Example Accounts you could have
 2020-01-01 open Income:Work:Salary
 2020-01-01 open Income:Work:Bonus
 2020-01-01 open Income:MobilePay
@@ -11,6 +12,8 @@
 2020-01-01 open Expenses:Consumption:Clothes
 2020-01-01 open Expenses:Consumption:Transport
 2020-01-01 open Expenses:Consumption:Vacation
+2020-01-01 open Expenses:Consumption:Tech
+2020-01-01 open Expenses:Consumption:Office
 2020-01-01 open Expenses:Consumption:Gifts
 2020-01-01 open Expenses:Consumption:Other
 
@@ -25,7 +28,12 @@
 2020-01-01 open Expenses:Subscription:Insurance
 2020-01-01 open Expenses:Subscription:Other
 
-2020-01-01 open Expenses:Investment:ASK
-2020-01-01 open Expenses:Investment:Depot
+2020-01-01 open Assets:Investment:SaxoBank:ASK:Cash
+2020-01-01 open Assets:Investment:SaxoBank:Depot:Cash
+
+2020-01-01 open Assets:Investment:Nordnet:Depot:Cash
+2020-01-01 open Income:Investment:Nordnet:PnL:Sales
+2020-01-01 open Income:Investment:Nordnet:PnL:Dividends
+
 2020-01-01 open Expenses:Tax
 2020-01-01 open Expenses:Interest

@@ -1,0 +1,1 @@
+bean-file config.py ~/Documents/beancounter/data/*.csv

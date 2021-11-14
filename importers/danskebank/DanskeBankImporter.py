@@ -25,7 +25,7 @@ class Importer(importer.ImporterProtocol):
 
     def identify(self, f):
         if re.search("(Main)[-][0-9]{10}[-][0-9]{8}", os.path.basename(f.name)):
-            #if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
+            # if date.today().strftime("%Y%m%d") in os.path.basename(f.name):
             return True
         else:
             return False
@@ -82,12 +82,14 @@ class Importer(importer.ImporterProtocol):
                     )
 
                     txn.postings.append(
-                        data.Posting(self.account, amount.Amount(D(trans_amt),
-                                                                        'DKK'), None, None, None, None)
+                        data.Posting(self.account,
+                                     amount.Amount(D(trans_amt), 'DKK'),
+                                     None, None, None, None)
                     )
                     txn.postings.append(
-                        data.Posting(destination_account, amount.Amount(D(trans_amt_dec * -1),
-                                                                        'DKK'), None, None, None, None)
+                        data.Posting(destination_account,
+                                     amount.Amount(D(trans_amt_dec * -1), 'DKK'),
+                                     None, None, None, None)
                     )
 
                     # at start of file balance
@@ -98,7 +100,7 @@ class Importer(importer.ImporterProtocol):
                                          self.account,
                                          # must subtract initial cost to have "before" picture
                                          # might cause issues if there are close dates...we will find out.
-                                         amount.Amount(balance_amt_dec+trans_amt_dec * -1, 'DKK'), None, None))
+                                         amount.Amount(balance_amt_dec + trans_amt_dec * -1, 'DKK'), None, None))
                     entries.append(txn)
 
                 # else pending purchases, will get them next file when they are ready.

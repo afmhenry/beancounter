@@ -46,19 +46,23 @@ class Importer(importer.ImporterProtocol):
     def extract(self, f):
         entries = []
         known_accounts = get_accounts()
+        prev_trans_date = date.today()
+        cash_holdings_dkk = 0
+        seen_dates = []
 
         with open(f.name, encoding="utf-16-le") as f:
             for _ in range(1):  # first line has headers
                 next(f)
             ff = enumerate(csv.reader(f, delimiter='\t'))
             for index, row in reversed(list(ff)):
-                trans_date = parse(row[2]).date()
+
+                trans_date = parse(row[1]).date()
+                meta = data.new_metadata(f.name, index)
                 trans_type = row[5]
                 currency = row[15]
                 currency_modifier = stringToDecimalFromDA(row[20])
                 cash_delta = stringToDecimalFromDA(row[14])
                 result_of_sale = stringToDecimalFromDA(row[17])
-                cash_holdings_dkk = stringToDecimalFromDA(row[19])
                 ticker = row[6].split(" ")[0]
                 amount_of_shares = stringToDecimalFromDA(row[9])
                 cost_per_share = round(stringToDecimalFromDA(row[10]) * currency_modifier, 2)
@@ -66,8 +70,21 @@ class Importer(importer.ImporterProtocol):
                 commission = stringToDecimalFromDA(row[25])
                 transaction_text = row[21]
                 trans_entity = row[7]
-                meta = data.new_metadata(f.name, index)
                 narration = trans_type + ":" + trans_entity
+
+                if trans_date not in seen_dates:
+                    seen_dates.append(trans_date)
+                    if trans_type != "INDBETALING":
+                        # if we haven't seen this day before
+                        # todo: do balance operation PER DAY
+                        entries.append(
+                            # have to apply on day before, balance is date dependent and not based on order
+                            data.Balance(meta, trans_date,
+                                         self.source_account,
+                                         # must subtract initial cost to have "before" picture
+                                         # might cause issues if there are close dates...we will find out.
+                                         amount.Amount(D(cash_holdings_dkk), 'DKK'), None, None))
+                cash_holdings_dkk = stringToDecimalFromDA(row[19])
 
                 if transaction_text != "":
                     narration = transaction_text
@@ -91,10 +108,12 @@ class Importer(importer.ImporterProtocol):
                         entries.append(directions[1])
                         known_accounts = directions[2]
 
+                    # to avoid unbalanced amounts,self-fulfilling prophecy--what matters is what I paid in sum.
                     txn.postings.append(
                         data.Posting(destination_account,
                                      amount.Amount(D(amount_of_shares), ticker),
-                                     Cost(D(cost_per_share), currency, trans_date, None),
+                                     Cost(-1 * round((D(cash_delta) + D(commission)) / D(amount_of_shares), 4),
+                                          currency, trans_date, None),
                                      None, None, None)
                     )
 
@@ -126,7 +145,7 @@ class Importer(importer.ImporterProtocol):
                     # cash gained from sale
                     txn.postings.append(
                         data.Posting(self.source_account,
-                                     amount.Amount(D(cash_delta)-D(commission), currency),
+                                     amount.Amount(D(cash_delta), currency),
                                      None, None, None, None)
                     )
                     # minus commission
@@ -138,9 +157,7 @@ class Importer(importer.ImporterProtocol):
                         )
                     # net profit
                     txn.postings.append(
-                        data.Posting(self.sales_account,
-                                     amount.Amount(-1*(D(cash_delta)-D(cash_delta - result_of_sale - commission)), currency),
-                                     None, None, None, None)
+                        data.Posting(self.sales_account, None, None, None, None, None)
                     )
                     entries.append(txn)
                 elif trans_type == "UDB.":

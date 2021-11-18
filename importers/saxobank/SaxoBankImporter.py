@@ -9,7 +9,6 @@ from beancount.core import amount, account, position
 from beancount.core import flags
 from beancount.core import data, inventory
 from ..CommonImporter import *
-from ..Classifier import *
 from beancount.core.position import Cost, CostSpec
 
 from beancount.query.query import *
@@ -47,7 +46,7 @@ class Importer(importer.ImporterProtocol):
 
     def extract(self, f):
         entries = []
-        known_accounts = get_accounts()
+        known_accounts = getAccounts()
         print(f.name)
         wb = load_workbook(f.name)
         sheet_names = wb.get_sheet_names()
@@ -64,7 +63,7 @@ class Importer(importer.ImporterProtocol):
             if row[0] == "Trade ID":
                 continue
             if "ASK" in row[1]:
-                # then trades are for ASK account
+                # then trades are for ASK account, not depot
                 destination_account = self.source_account.replace("Depot", "ASK")
             trade_id = row[0]
             trans_instrument = row[2]
@@ -139,7 +138,6 @@ class Importer(importer.ImporterProtocol):
                         cost_basis = "%.2f" % lookup_row[12]
                         cost_per_share = "%.2f" % lookup_row[13]
                         opened_date = parse(datetime.datetime.strftime(lookup_row[1], "%Y-%m-%d %H:%M:%S")).date()
-
 
                 directions = createAccountIfMissing(destination_account.replace("Cash", ticker),
                                                     known_accounts,

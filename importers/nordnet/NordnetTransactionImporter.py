@@ -7,7 +7,6 @@ from beancount.core import amount, account, position
 from beancount.core import flags
 from beancount.core import data, inventory
 from ..CommonImporter import *
-from ..Classifier import *
 from beancount.core.position import Cost, CostSpec
 
 from beancount.query.query import *
@@ -45,7 +44,7 @@ class Importer(importer.ImporterProtocol):
 
     def extract(self, f):
         entries = []
-        known_accounts = get_accounts()
+        known_accounts = getAccounts()
         prev_trans_date = date.today()
         cash_holdings_dkk = 0
         seen_dates = []
@@ -76,7 +75,6 @@ class Importer(importer.ImporterProtocol):
                     seen_dates.append(trans_date)
                     if trans_type != "INDBETALING":
                         # if we haven't seen this day before
-                        # todo: do balance operation PER DAY
                         entries.append(
                             # have to apply on day before, balance is date dependent and not based on order
                             data.Balance(meta, trans_date,

@@ -1,34 +1,54 @@
 # might try to make common helper functions here
 from decimal import Decimal
-import xlrd
-import csv
 import os
 import requests
+import feedparser
 import sys
 import json
 import datetime
+from datetime import date
+from dateutil.parser import parse
 from beancount.core import data
 import tkinter as tk
 
 
 def getCurrentStockPrice(ticker):
+    # auth is bash env variable...easier this way.
     access_key = os.environ["marketstack_pass"]
 
     base_url = "http://api.marketstack.com/v1/"
     ticker_path = "tickers"
     ticker_parameters = {'access_key': access_key, "search": ticker}
 
-    options = json.loads(getAPI(base_url + ticker_path, ticker_parameters))
+    options = getAPI(base_url + ticker_path, ticker_parameters)
     for option in options:
         if option["symbol"].split(".")[1] in ["XETRA", "XCSE"]:
             price_url = "eod"
             price_parameters = {'access_key': access_key, "symbols": option["symbol"]}
-            prices = json.load(getAPI(price_url, price_parameters))
-            close_price = prices[0]["close"]
-            close_date = prices[0]["date"]
-            return close_date, close_price
+            prices = getAPI(base_url + price_url, price_parameters)
+            close_price = Decimal(prices[0].get("close")) * 1
+            close_date = prices[0].get("date")
+
+            # if the ticker is on german bourse, convert to dkk from eur
+            if option["symbol"].split(".")[1] == "XETRA":
+                close_price *= convertInputCurrToDKK("EUR")
+            # can easily re-use logic to convert usd to eur
+            # return tuple with date,price
+            return formatMarketstackDate(close_date), close_price
 
     return "failed", "call"
+
+
+def formatMarketstackDate(date_string):
+    return parse(datetime.datetime.strptime(date_string.replace("+0000", ""), "%Y-%m-%dT%H:%M:%S")
+                 .strftime("%Y-%m-%d")).date()
+
+
+def convertInputCurrToDKK(currency):
+    price_feed = feedparser.parse("https://www.nationalbanken.dk/en/statistics/exchange_rates/Pages/_vti_bin/DN"
+                                  "/DataService.svc/CurrencyRateRSS?lang=en&iso=" + currency)
+    entry = price_feed.entries[0]
+    return Decimal(entry.description.split(" ")[3].replace(",", ".")) / 100
 
 
 def getAPI(url, params):
@@ -64,12 +84,38 @@ def stringToDecimalFromDA(str_num):
 
 def getAccounts():
     accounts = []
-    with open(sys.argv[3]) as f:
-        for line in f:
+    with open(sys.argv[3]) as lines:
+        for line in lines:
             if " open " in line and "Equity" not in line:
                 line = line.split(" ")
                 accounts.append(line[2].replace("\n", ""))
     return accounts
+
+
+def getTickersWithPriceStatusInLast10Days():
+    tickers = []
+    with open(sys.argv[3]) as lines:
+        for line in reversed(lines.readlines()):
+            if " price " in line:
+                line = line.split(" ")
+                last_run = parse(line[0]).date() + datetime.timedelta(days=+10)
+                if last_run > date.today():
+                    tickers.append(line[2])
+    return tickers
+
+
+def fromAccountsGetTickers(known_accounts):
+    ticker_list = []
+    for active_account in known_accounts:
+        if ("SaxoBank" in active_account or
+            "Nordnet" in active_account) and \
+                ("Cash" not in active_account and
+                 "Income" not in active_account and
+                 "Dividends" not in active_account):
+            ticker_position = len(active_account.split(":"))
+            ticker = active_account.split(":")[ticker_position - 1]
+            ticker_list.append(ticker)
+    return ticker_list
 
 
 def getCategories():
@@ -78,7 +124,7 @@ def getCategories():
         return mapping
 
 
-def split_acc_types():
+def splitAccountTypes():
     account_mapping = getAccounts()
     expense_mapping = []
     income_mapping = []
@@ -97,7 +143,7 @@ def setupWindow():
     return root
 
 
-def formatWindow(root, description, cost, date, purchase_mapping, expense_mapping, income_mapping):
+def formatWindow(root, description, cost, date_of_trans, purchase_mapping, expense_mapping, income_mapping):
     def getInput():
         account = clicked1.get()
         if account == "Expenses":
@@ -111,7 +157,7 @@ def formatWindow(root, description, cost, date, purchase_mapping, expense_mappin
                 child.destroy()
         root.quit()
 
-    label = tk.Label(name="description", text=description + "\n" + cost + "\n" + str(date),
+    label = tk.Label(name="description", text=description + "\n" + cost + "\n" + str(date_of_trans),
                      foreground="white",
                      background="black",
                      width=20,
@@ -142,11 +188,11 @@ def get_exceptions():
         return mapping
 
 
-def modify_if_in_exceptions(description, date):
+def modify_if_in_exceptions(description, date_of_trans):
     exception_list = get_exceptions()
     for value in exception_list:
         if value in description:
-            return description + " " + date
+            return description + " " + date_of_trans
         else:
             return description
 

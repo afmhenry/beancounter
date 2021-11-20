@@ -40,7 +40,7 @@ class Importer(importer.ImporterProtocol):
         return 'Nordnet-Depot-Status.csv'
 
     def file_account(self, _):
-        return self.source_account.replace(":Depot:Cash", "")
+        return "documents/"+self.source_account.replace(":Depot:Cash", "")
 
     def extract(self, f):
         entries = []
@@ -78,11 +78,16 @@ class Importer(importer.ImporterProtocol):
                         # todo: do balance operation PER DAY
                         entries.append(
                             # have to apply on day before, balance is date dependent and not based on order
-                            data.Balance(meta, trans_date,
-                                         self.source_account,
-                                         # must subtract initial cost to have "before" picture
-                                         # might cause issues if there are close dates...we will find out.
-                                         amount.Amount(D(cash_holdings_dkk), 'DKK'), None, None))
+                            data.Balance(
+                                meta, trans_date,
+                                self.source_account,
+                                # must subtract initial cost to have "before" picture
+                                # might cause issues if there are close dates...we will find out.
+                                amount.Amount(D(cash_holdings_dkk), 'DKK'),
+                                D(1),
+                                None
+                            )
+                        )
                 cash_holdings_dkk = stringToDecimalFromDA(row[19])
 
                 if transaction_text != "":
@@ -109,24 +114,28 @@ class Importer(importer.ImporterProtocol):
 
                     # to avoid unbalanced amounts,self-fulfilling prophecy--what matters is what I paid in sum.
                     txn.postings.append(
-                        data.Posting(destination_account,
-                                     amount.Amount(D(amount_of_shares), ticker),
-                                     Cost(-1 * round((D(cash_delta) + D(commission)) / D(amount_of_shares), 4),
-                                          currency, trans_date, None),
-                                     None, None, None)
+                        data.Posting(
+                            destination_account,
+                            amount.Amount(D(amount_of_shares), ticker),
+                            Cost(-1 * round((D(cash_delta) + D(commission)) / D(amount_of_shares), 4),
+                                 currency, trans_date, None),
+                            None, None, None)
                     )
 
                     # minus commission
                     if commission > 0:
                         txn.postings.append(
-                            data.Posting(self.commission_account,
-                                         amount.Amount(D(commission), currency),
-                                         None, None, None, None)
+                            data.Posting(
+                                self.commission_account,
+                                amount.Amount(D(commission), currency),
+                                None, None, None, None)
                         )
                     # minus cash it cost
                     txn.postings.append(
-                        data.Posting(self.source_account,
-                                     amount.Amount(D(cash_delta), currency), None, None, None, None)
+                        data.Posting(
+                            self.source_account,
+                            amount.Amount(D(cash_delta), currency),
+                            None, None, None, None)
                     )
                     entries.append(txn)
                 elif trans_type == "SOLGT":
@@ -135,28 +144,33 @@ class Importer(importer.ImporterProtocol):
                     # make posting buying stock ticker as currency
                     destination_account = self.source_account.replace("Cash", ticker)
                     txn.postings.append(
-                        data.Posting(destination_account,
-                                     amount.Amount(amount_of_shares * -1, ticker),
-                                     CostSpec(D(cost_basis), None, currency, None, None, None),
-                                     amount.Amount(cost_per_share, currency), None, None)
+                        data.Posting(
+                            destination_account,
+                            amount.Amount(amount_of_shares * -1, ticker),
+                            CostSpec(D(cost_basis), None, currency, None, None, None),
+                            amount.Amount(cost_per_share, currency), None, None)
                     )
 
                     # cash gained from sale
                     txn.postings.append(
-                        data.Posting(self.source_account,
-                                     amount.Amount(D(cash_delta), currency),
-                                     None, None, None, None)
+                        data.Posting(
+                            self.source_account,
+                            amount.Amount(D(cash_delta), currency),
+                            None, None, None, None)
                     )
                     # minus commission
                     if commission > 0:
                         txn.postings.append(
-                            data.Posting(self.commission_account,
-                                         amount.Amount(D(commission), currency),
-                                         None, None, None, None)
+                            data.Posting(
+                                self.commission_account,
+                                amount.Amount(D(commission), currency),
+                                None, None, None, None)
                         )
                     # net profit
                     txn.postings.append(
-                        data.Posting(self.sales_account, None, None, None, None, None)
+                        data.Posting(
+                            self.sales_account,
+                            None, None, None, None, None)
                     )
                     entries.append(txn)
                 elif trans_type == "UDB.":
@@ -167,12 +181,15 @@ class Importer(importer.ImporterProtocol):
                                        str(cost_per_share) + " " + currency
                     }
                     # store this for next line--where we apply the gain with the tax line
-                    temp_dividend_0 = data.Posting(self.dividends_account,
-                                                   amount.Amount(total_before_commission * -1, currency),
-                                                   None,
-                                                   None,
-                                                   None,
-                                                   dividend_meta_info)
+                    temp_dividend_0 = data.Posting(
+                        self.dividends_account,
+                        amount.Amount(total_before_commission * -1, currency),
+                        None,
+                        None,
+                        None,
+                        dividend_meta_info
+                    )
+
                     temp_dividend_2 = total_before_commission
 
                 elif trans_type == "UDBYTTESKAT":

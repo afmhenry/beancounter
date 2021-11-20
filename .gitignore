@@ -7,5 +7,5 @@ data/mapping-private.json
 *.pyc
 .DS_Store
 *.csv
-Assets/*
+documents/*
 *.xlsx

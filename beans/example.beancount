@@ -1,10 +1,8 @@
+plugin "beancount.plugins.unrealized" "Unrealized"
+
 2020-01-01 open Equity:Opening-Balance DKK,USD
 2020-01-01 open Assets:DanskeBank:Checking DKK
-2020-01-01 open Equity:Danica DKK
-2020-01-01 open Equity:Saxo:ASK DKK
-2020-01-01 open Equity:NordNet:Depot DKK
 2020-01-01 open Assets:Schwab:Checking USD
-2020-01-01 open Equity:Schwab:Brokerage USD
 
 2020-01-01 open Expenses:Consumption:Grocery DKK
 2020-01-01 open Expenses:Consumption:EatingOut DKK

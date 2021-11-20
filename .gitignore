@@ -1,11 +1,10 @@
 venv/
 beans/test.beancount
 beans/alex.beancount
-beans/example.beancount
 data/mapping-private.json
 .idea/*
 *.pyc
 .DS_Store
 *.csv
-Assets/*
+documents/*
 *.xlsx

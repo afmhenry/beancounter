@@ -6,11 +6,11 @@ from beancount.ingest import importer
 from beancount.core import amount
 from beancount.core import flags
 from beancount.core import data
-from ..Classifier import *
 
 from datetime import date
 from dateutil.parser import parse
 import datetime
+from ..CommonImporter import *
 
 from titlecase import titlecase
 
@@ -34,14 +34,14 @@ class Importer(importer.ImporterProtocol):
         return 'Danske-Bank-Checking.csv'
 
     def file_account(self, _):
-        return self.account
+        return "documents/"+self.account
 
     def extract(self, f):
         entries = []
-        account_by_type = split_acc_types()
+        account_by_type = splitAccountTypes()
 
-        mapping = get_categories()
-        root = setup_window()
+        mapping = getCategories()
+        root = setupWindow()
 
         with open(f.name, encoding="latin1") as f:
             for _ in range(1):  # first line has headers
@@ -65,8 +65,8 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        mappings = format_window(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
-                                                 account_by_type[1])
+                        mappings = formatWindow(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
+                                                account_by_type[1])
                         destination_account = mappings[0][mappings[1]]
                         mapping = mappings[0]
 

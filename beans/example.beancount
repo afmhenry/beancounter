@@ -1,3 +1,5 @@
+plugin "beancount.plugins.unrealized" "Unrealized"
+
 2020-01-01 open Equity:Opening-Balance DKK,USD
 2020-01-01 open Assets:DanskeBank:Checking DKK
 2020-01-01 open Assets:Schwab:Checking USD

@@ -64,6 +64,19 @@ Paths present in the scripts may need adjusting.
 
 You will also have to chmod u+x the scripts. 
 
+Adding a new importer is pretty trivial--you have 3 examples of how to handle different formats. Copy, paste, 
+test using run mapping script :)
+
+Make sure to get the right encoding, accepted values can be found here:
+https://docs.python.org/3/library/codecs.html#encodings-and-unicode
+
+You can determine what encoding the downloaded bank file is in, by running this in the cli. 
+  
+```
+>> file filename
+>> 2021-11-14.Nordnet-Depot-Transactions.csv: Little-endian UTF-16 Unicode text, with very long lines, with CRLF line terminators
+```
+
 # General to do:
 * find out how to handle selling at different cost basis
 * See what customization is possible with fava--what views are most valuable for me. 

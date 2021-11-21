@@ -97,44 +97,50 @@ class Importer(importer.ImporterProtocol):
                     links=set(),
                     postings=[],
                 )
+                ticker_account = self.source_account.replace("Cash", ticker)
 
+                # make posting buying stock ticker as currency
                 if trans_type == "KØBT":
-                    # make posting buying stock ticker as currency
-                    destination_account = self.source_account.replace("Cash", ticker)
-                    directions = createAccountIfMissing(destination_account, known_accounts, ticker, trans_date, meta)
-                    if directions[0]:
-                        entries.append(directions[1])
-                        known_accounts = directions[2]
+
+                    openAccountIfMissing(entries, ticker_account, known_accounts, ticker, trans_date, meta)
 
                     # to avoid unbalanced amounts,self-fulfilling prophecy--what matters is what I paid in sum.
+
                     txn.postings.append(
-                        data.Posting(destination_account,
+                        data.Posting(ticker_account,
                                      amount.Amount(D(amount_of_shares), ticker),
                                      Cost(-1 * round((D(cash_delta) + D(commission)) / D(amount_of_shares), 4),
                                           currency, trans_date, None),
                                      None, None, None)
                     )
+                    # minus commission posting
+                    appendCommissionPosting(
+                        txn,
+                        self.commission_account,
+                        commission,
+                        False,
+                        currency
+                    )
 
-                    # minus commission
-                    if commission > 0:
-                        txn.postings.append(
-                            data.Posting(self.commission_account,
-                                         amount.Amount(D(commission), currency),
-                                         None, None, None, None)
-                        )
                     # minus cash it cost
                     txn.postings.append(
                         data.Posting(self.source_account,
                                      amount.Amount(D(cash_delta), currency), None, None, None, None)
                     )
                     entries.append(txn)
+                    entries.append(
+                        data.Price(meta, trans_date, ticker, amount.Amount(D(cost_per_share), "DKK"))
+                    )
                 elif trans_type == "SOLGT":
                     # determine original cost based on profit
                     cost_basis = (cash_delta - result_of_sale - commission) / amount_of_shares
                     # make posting buying stock ticker as currency
-                    destination_account = self.source_account.replace("Cash", ticker)
+                    txn.appendStockSellingPosting(
+                        ticker, ticker_account, trans_date,
+                        amount_of_shares, cost_basis, cost_per_share, currency
+                    )
                     txn.postings.append(
-                        data.Posting(destination_account,
+                        data.Posting(ticker_account,
                                      amount.Amount(amount_of_shares * -1, ticker),
                                      CostSpec(D(cost_basis), None, currency, None, None, None),
                                      amount.Amount(cost_per_share, currency), None, None)
@@ -147,12 +153,13 @@ class Importer(importer.ImporterProtocol):
                                      None, None, None, None)
                     )
                     # minus commission
-                    if commission > 0:
-                        txn.postings.append(
-                            data.Posting(self.commission_account,
-                                         amount.Amount(D(commission), currency),
-                                         None, None, None, None)
-                        )
+                    appendCommissionPosting(
+                        txn,
+                        self.commission_account,
+                        commission,
+                        False,
+                        currency
+                    )
                     # net profit
                     txn.postings.append(
                         data.Posting(self.sales_account, None, None, None, None, None)

@@ -7,9 +7,88 @@ import sys
 import json
 import datetime
 from datetime import date
+
+from beancount.core.position import Cost, CostSpec
 from dateutil.parser import parse
+from beancount.core.number import D
 from beancount.core import data
+from beancount.core import amount
 import tkinter as tk
+
+
+def appendCommissionPosting(txn, account, commission, commission_is_negative, currency):
+    if commission_is_negative:
+        commission = D(commission) * -1
+    else:
+        commission = D(commission)
+
+    if commission:
+        txn.postings.append(
+            data.Posting(
+                account,
+                amount.Amount(
+                    commission,
+                    currency),
+                None,  # Cost or CostSpec
+                None,  # price
+                None,  # flag
+                None  # metadata dict
+            )
+        )
+
+
+def appendStockPurchasePosting(txn, ticker, account, trans_date, amount_of_shares, share_price, currency):
+    # purchase posting
+
+    txn.postings.append(
+        data.Posting(
+            account,
+            amount.Amount(D(amount_of_shares), ticker),
+            Cost(D(share_price),
+                 currency,
+                 trans_date,
+                 None
+                 ),  # label--seems that  I can define lots here...todo: look into that
+            None,
+            None,  # price
+            None,  # flag
+            None  # metadata dict
+        )
+    )
+
+
+def appendStockSellingPosting(txn, ticker, account, trans_date,
+                              amount_of_shares, open_share_price, close_share_price, currency):
+    txn.postings.append(
+        data.Posting(
+            account,
+            amount.Amount(D(amount_of_shares), ticker),
+            CostSpec(
+                D(open_share_price),
+                None,
+                currency,
+                trans_date,
+                None,
+                None),
+            amount.Amount(close_share_price, currency),  # price
+            None,  # flag
+            None  # metadata dict
+        )
+    )
+
+
+def openAccountIfMissing(entries, account_name, known_accounts, ticker, trans_date, meta):
+    if account_name not in known_accounts:
+        entries.append(
+            data.Open(
+                meta,
+                trans_date + datetime.timedelta(days=-1),
+                account_name,
+                [ticker],
+                None
+            )
+        )
+        known_accounts.append(account_name)
 
 
 def getCurrentStockPrice(ticker):
@@ -36,7 +115,7 @@ def getCurrentStockPrice(ticker):
             # return tuple with date,price
             return formatMarketstackDate(close_date), close_price
 
-    return "failed", "call"
+    return parse("2020-11-21").date(), -1
 
 
 def formatMarketstackDate(date_string):
@@ -58,21 +137,6 @@ def getAPI(url, params):
         return response.get("data")
     else:
         return ""
-
-
-def createAccountIfMissing(account_name, known_accounts, ticker, trans_date, meta):
-    if account_name not in known_accounts:
-        data_obj = data.Open(meta,
-                             trans_date + datetime.timedelta(days=-1),
-                             account_name,
-                             [ticker],
-                             None
-                             )
-
-        known_accounts.append(account_name)
-        return True, data_obj, known_accounts
-    else:
-        return False, None, None
 
 
 def stringToDecimalFromDA(str_num):
@@ -150,7 +214,7 @@ def formatWindow(root, description, cost, date_of_trans, purchase_mapping, expen
             account = clicked2.get()
         # nonlocal description
         # description = exceptions(description, account)
-        add_category_mapping(description, account, purchase_mapping)
+        addCategoryMapping(description, account, purchase_mapping)
         # black magic to make the dropdowns die.
         for child in root.winfo_children():
             if str(child.__class__.__name__) == "OptionMenu":
@@ -188,7 +252,7 @@ def get_exceptions():
         return mapping
 
 
-def modify_if_in_exceptions(description, date_of_trans):
+def ifExceptionModifyDescription(description, date_of_trans):
     exception_list = get_exceptions()
     for value in exception_list:
         if value in description:
@@ -210,7 +274,7 @@ def exceptions(description, account):
     return description
 
 
-def add_category_mapping(description, account, purchase_mapping):
+def addCategoryMapping(description, account, purchase_mapping):
     purchase_mapping[description] = account
 
     with open(sys.argv[2], 'w') as f:

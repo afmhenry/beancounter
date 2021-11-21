@@ -61,7 +61,7 @@ class Importer(importer.ImporterProtocol):
                     meta = data.new_metadata(f.name, index)
 
                     # todo: create mapping in elegant way--so I can also map new things quickly
-                    trans_desc = modify_if_in_exceptions(trans_desc, trans_date.strftime("%d-%m-%Y"))
+                    trans_desc = ifExceptionModifyDescription(trans_desc, trans_date.strftime("%d-%m-%Y"))
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:

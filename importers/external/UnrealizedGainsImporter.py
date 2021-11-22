@@ -2,6 +2,7 @@
 
 from beancount.core.number import D
 from beancount.ingest import importer
+
 from beancount.core import amount
 from ..CommonImporter import *
 from dateutil.parser import parse

@@ -77,6 +77,38 @@ You can determine what encoding the downloaded bank file is in, by running this 
 >> 2021-11-14.Nordnet-Depot-Transactions.csv: Little-endian UTF-16 Unicode text, with very long lines, with CRLF line terminators
 ```
 
+# Importer Details
+
+Each importer is written to match the source bank's format. Unfortunately, these files not always contain the neccessary 
+information to create the desired double ledger format. Let's talk about how we address that in the importers. 
+
+Danske Bank: No changes needed. After logging into netbank and selecting the relevant account, first select the period you want covered:
+  
+![](media/db_select_range.png)
+  
+And then save as file:
+![](media/db_save.png)
+
+Nordnet: No changes needed. 
+Go to transactions 
+![](media/nn_transactions.png)
+Select the period, export
+![](media/nn_period.png)
+
+Saxo Bank: The relevant information is spread across multiple available files. 
+So I download each and consolidate them as sheets in an excel file. 
+
+Log into Saxotrader.com
+Go to Account in the center top
+In Historic Reports download the *Trades* and *Account Statement* files
+In P/L Analysis download the *Closed Positions* file
+Merge the P/L sheet to the trades file, so that it is the 4th sheet (index 3)
+Merge the Account sheet to the trades file, so that it is the 5th sheet (index 4)
+Move the file and begin!
+
+
+I use API calls to assist the investment account's with determining unrealized gains. 
+
 # General to do:
 * find out how to handle selling at different cost basis
 * See what customization is possible with fava--what views are most valuable for me. 

@@ -42,26 +42,31 @@ class Importer(importer.ImporterProtocol):
 
         mapping = getCategories()
         root = setupWindow()
-
-        with open(f.name, encoding="latin1") as f:
+        trans_date = date.today()
+        with open(f.name, encoding="iso-8859-1") as f:
             for _ in range(1):  # first line has headers
                 next(f)
             for index, row in enumerate(csv.reader(f, delimiter=';')):
-                if "Udført" in row[4]:
+                # the fools at Danskbank made a breaking change on the file, so I have to offset....
+                i = 2
+                if "Udført" in row[4+i]:
                     trans_date = datetime.datetime.strptime(row[0], "%d.%m.%Y").strftime("%Y-%m-%d")
                     trans_date = parse(trans_date).date()
-                    trans_desc = row[1]
-                    trans_amt = float(row[2].replace(".", "").replace(",", "."))
+                    trans_desc = row[1+i]
+                    trans_amt = float(row[2+i].replace(".", "").replace(",", "."))
                     trans_amt = '{:.2f}'.format(trans_amt)
                     trans_amt_dec = D(trans_amt)
-                    balance_amt = float(row[3].replace(".", "").replace(",", "."))
+                    balance_amt = float(row[3+i].replace(".", "").replace(",", "."))
                     balance_amt = '{:.2f}'.format(balance_amt)
                     balance_amt_dec = D(balance_amt)
 
                     meta = data.new_metadata(f.name, index)
 
-                    # todo: create mapping in elegant way--so I can also map new things quickly
-                    trans_desc = modify_if_in_exceptions(trans_desc, trans_date.strftime("%d-%m-%Y"))
+                    # This would be a repeat since we read in payslip separately.
+                    # The posting will show up there with a lot more info
+                    #if "Lønoverførsel" == trans_desc:
+                        #continue
+                    trans_desc = ifExceptionModifyDescription(trans_desc, trans_date.strftime("%d-%m-%Y"))
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
@@ -106,6 +111,7 @@ class Importer(importer.ImporterProtocol):
                 # else pending purchases, will get them next file when they are ready.
 
             # At end of file, balance
+            meta = data.new_metadata(f.name, index)
             entries.append(
                 data.Balance(meta, trans_date + datetime.timedelta(days=1),
                              self.account,

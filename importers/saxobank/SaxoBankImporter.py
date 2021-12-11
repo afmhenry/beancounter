@@ -42,7 +42,7 @@ class Importer(importer.ImporterProtocol):
         return 'SaxoBank-Transactions.xlsx'
 
     def file_account(self, _):
-        return "documents/"+self.source_account.replace(":Depot:Cash", "").replace(":ASK:Cash", "")
+        return "documents/" + self.source_account.replace(":Depot:Cash", "").replace(":ASK:Cash", "")
 
     def extract(self, f):
         entries = []
@@ -69,7 +69,11 @@ class Importer(importer.ImporterProtocol):
                 destination_account = self.source_account.replace("Depot", "ASK")
             trade_id = row[0]
             trans_instrument = row[2]
-            trans_date = parse(datetime.datetime.strftime(row[3], "%Y-%m-%d %H:%M:%S")).date()
+            trans_date = parse(
+                datetime.datetime.strftime(
+                    row[3],
+                    "%Y-%m-%d %H:%M:%S")
+            ).date()
             trans_type = row[4]
             amount_of_shares = row[6]
             close_share_price = "0"
@@ -103,45 +107,50 @@ class Importer(importer.ImporterProtocol):
                 links=set(),
                 postings=[],
             )
+            ticker_account = destination_account.replace("Cash", ticker)
 
             if trans_type == "Bought":
-                directions = createAccountIfMissing(destination_account.replace("Cash", ticker), known_accounts, ticker,
-                                                    trans_date, meta)
-                if directions[0]:
-                    entries.append(directions[1])
-                    known_accounts = directions[2]
 
-                txn.postings.append(
-                    data.Posting(
-                        destination_account.replace("Cash", ticker),
-                        amount.Amount(D(amount_of_shares), ticker),
-                        Cost(D(close_share_price), currency, trans_date, None),
-                        None, None, None)
+                entries, known_accounts = openAccountIfMissing(
+                    entries, ticker_account, known_accounts, ticker, trans_date, meta)
+
+                # purchase posting
+                appendStockPurchasePosting(
+                    txn,
+                    ticker,
+                    ticker_account,
+                    trans_date,
+                    amount_of_shares,
+                    close_share_price,
+                    currency
                 )
 
-                # minus commission
-                if commission != 0:
-                    txn.postings.append(
-                        data.Posting(
-                            self.commission_account,
-                            amount.Amount(D(commission) * -1, currency),
-                            None, None, None, None)
-                    )
-                # minus cash it cost
+                # minus commission posting
+                appendCommissionPosting(
+                    txn,
+                    self.commission_account,
+                    commission,
+                    True,
+                    currency
+                )
 
+                # minus cash it cost
+                # cash out--i leave it empty due to tiny rounding issues
                 purchase_meta_info = {
                     "total_cost": "{" +
                                   str(amount_of_shares) + " " + ticker +
                                   "} @ " +
                                   str(close_share_price) + " = " + total_incl_commission + " " + currency
                 }
-
                 txn.postings.append(
                     data.Posting(
                         destination_account,
                         None, None, None, None, purchase_meta_info)
                 )
                 entries.append(txn)
+                entries.append(
+                    data.Price(meta, trans_date, ticker, amount.Amount(D(close_share_price), "DKK"))
+                )
 
             elif trans_type == "Sold":
 
@@ -152,17 +161,10 @@ class Importer(importer.ImporterProtocol):
                         close_share_price = "%.2f" % lookup_row[13]
                         opened_date = parse(datetime.datetime.strftime(lookup_row[1], "%Y-%m-%d %H:%M:%S")).date()
 
-                directions = createAccountIfMissing(
-                    destination_account.replace("Cash", ticker),
-                    known_accounts,
-                    ticker,
-                    trans_date,
-                    meta)
+                openAccountIfMissing(
+                    entries, ticker_account, known_accounts, ticker, trans_date, meta)
 
-                if directions[0]:
-                    entries.append(directions[1])
-                    known_accounts = directions[2]
-
+                # Sell Stock Posting
                 txn.postings.append(
                     data.Posting(
                         destination_account.replace("Cash", ticker),
@@ -171,14 +173,15 @@ class Importer(importer.ImporterProtocol):
                         amount.Amount(D(close_share_price), currency), None, None)
                 )
 
-                # minus commission
-                if commission != 0:
-                    txn.postings.append(
-                        data.Posting(
-                            self.commission_account,
-                            amount.Amount(D(commission) * -1, currency),
-                            None, None, None, None)
-                    )
+                # minus commission posting
+                appendCommissionPosting(
+                    txn,
+                    self.commission_account,
+                    commission,
+                    True,
+                    currency
+                )
+
                 # minus cash it cost
                 txn.postings.append(
                     data.Posting(

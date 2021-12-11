@@ -32,6 +32,14 @@ currencies, and still be aware of the details of the holding
 
 ![Fava Income](media/fava_income.png?raw=true "Fava Assets")
 
+## Support for several banks' formats
+
+* Danske Bank
+* Saxo Bank
+* Nordnet
+* Charles Schwab (WIP)
+* Visma Payslip
+
 ## Near full automation
 
 Only manual steps are:
@@ -42,7 +50,7 @@ Only manual steps are:
     * verify the account balance, before moving the imported files.
 * Run the mapping script
 * Run the start script
-* Run the move script.
+* Run the move script. (or run the mock-move if you want to be sure files are moved properly)
     
 This can be done as frequently as you want, but I wouldn't see a need to do it more than monthly
 
@@ -56,17 +64,65 @@ This can be done as frequently as you want, but I wouldn't see a need to do it m
   * `start.sh`: Apply the built mapping to your beancount file, consume files
   * `check.sh`: Only check the file: if you hear nothing that is good :)
   * `fava.sh`: Visualize the provided beancount file with fava. 
-  * `move.sh`: Move your ingress files from `data`folder to structured folders after ingestion. -n flag is a test run, 
-  * so you can safely see if you have implemented the file_account function on the importer as expected. 
-  * `test.sh`: Test smaller parts of the code to avoid mapping or start processes.  
+  * `move.sh`: Move your ingress files from `data`folder to structured folders after ingestion. - 
+  * `mock-move.sh`: Same as above, in mock mode "-n", check if you implemented the file_account function on the 
+importer as expected.
+  * `test.sh`: Test smaller parts of the code to avoid mapping or start processes. 
 
 Paths present in the scripts may need adjusting.
 
 You will also have to chmod u+x the scripts. 
 
+Adding a new importer to a different bank is pretty trivial--you have several examples of how to handle different formats. Copy, paste, 
+test using run mapping script :)
+
+Make sure to get the right encoding, accepted values can be found here:
+https://docs.python.org/3/library/codecs.html#encodings-and-unicode
+
+You can determine what encoding the downloaded bank file is in, by running this in the cli. 
+  
+```
+>> file filename
+>> 2021-11-14.Nordnet-Depot-Transactions.csv: Little-endian UTF-16 Unicode text, with very long lines, with CRLF line terminators
+```
+
+# Importer Details
+
+Each importer is written to match the source bank's format. Unfortunately, these files not always contain the neccessary 
+information to create the desired double ledger format. Let's talk about how we address that in the importers. 
+
+Danske Bank: No changes needed. After logging into netbank and selecting the relevant account, first select the period you want covered:
+  
+![](media/db_select_range.png)
+  
+And then save as file:
+![](media/db_save.png)
+
+Nordnet: No changes needed. 
+Go to transactions 
+![](media/nn_transactions.png)
+Select the period, export
+![](media/nn_period.png)
+
+Saxo Bank: The relevant information is spread across multiple available files. 
+So I download each and consolidate them as sheets in an excel file. 
+
+Log into Saxotrader.com
+Go to Account in the center top
+In Historic Reports download the *Trades* and *Account Statement* files
+In P/L Analysis download the *Closed Positions* file
+Merge the P/L sheet to the trades file, so that it is the 4th sheet (index 3)
+Merge the Account sheet to the trades file, so that it is the 5th sheet (index 4)
+Move the file and begin!
+
+
+I use API calls to assist the investment account's with determining unrealized gains. 
+
 # General to do:
 * find out how to handle selling at different cost basis
 * See what customization is possible with fava--what views are most valuable for me. 
+* bean-report--same as above
+* if I can avoid a monolith single beancount file--build it so there is some rolling of files
 * See what options there are for a [query interface](https://beancount.github.io/docs/beancount_query_language.html) and how that can be used to have fine tune control.
 
 

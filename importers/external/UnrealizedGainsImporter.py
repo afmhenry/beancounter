@@ -2,6 +2,7 @@
 
 from beancount.core.number import D
 from beancount.ingest import importer
+
 from beancount.core import amount
 from ..CommonImporter import *
 from dateutil.parser import parse
@@ -35,17 +36,20 @@ class Importer(importer.ImporterProtocol):
         ticker_update = [x for x in ticker_existing if x not in skip_tickers]
 
         for ticker in ticker_update:
-            # i = i + 1
             meta = data.new_metadata(f.name, i)
-            price_tuple = getCurrentStockPrice(ticker)
+            trans_date, price = getCurrentStockPrice(ticker)
 
             # todo: prompt to insert value and date for unknown tickers.
-            if price_tuple == ('failed', 'call'):
-                price_tuple = (parse("2020-11-21").date(), 1)
+            if price == -1:
                 meta.update(
-                    {"error": "{stock ticker not found, insert manually}"})
+                    {"error": "Stock ticker not found, insert manually"}
+                )
             entries.append(
-                data.Price(meta, price_tuple[0], ticker, amount.Amount(D(round(price_tuple[1], 2)), "DKK"))
+                data.Price(
+                    meta,
+                    trans_date,
+                    ticker,
+                    amount.Amount(D(round(price, 2)), "DKK"))
             )
 
         return entries

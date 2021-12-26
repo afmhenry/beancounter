@@ -1,1 +1,1 @@
-python3 test.py  ~/Documents/beancounter/config.py ~/Documents/beancounter/data/mapping-private.json ~/Documents/beancounter/beans/alex.beancount ~/Documents/beancounter/data/exceptions.json
+python3 ~/Documents/beancounter/test.py  ~/Documents/beancounter/config.py ~/Documents/beancounter/data/mapping-private.json ~/Documents/beancounter/beans/alex.beancount ~/Documents/beancounter/data/exceptions.json

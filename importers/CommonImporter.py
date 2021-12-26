@@ -16,6 +16,14 @@ from beancount.core import amount
 import tkinter as tk
 
 
+def danishToStdDec(value):
+    return Decimal(
+        value.replace("-", "")
+            .replace(".", "")
+            .replace(",", ".")
+    )
+
+
 def appendCommissionPosting(txn, account, commission, commission_is_negative, currency):
     if commission_is_negative:
         commission = D(commission) * -1

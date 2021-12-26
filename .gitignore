@@ -6,5 +6,8 @@ data/mapping-private.json
 *.pyc
 .DS_Store
 *.csv
+*.CSV
 documents/*
 *.xlsx
+*.pdf
+*.PDF

@@ -56,8 +56,8 @@ class Importer(importer.ImporterProtocol):
 
                     # This would be a repeat since we read in payslip separately.
                     # The posting will show up there with a lot more info
-                    #if "Lønoverførsel" == trans_desc:
-                        #continue
+                    if "Lønoverførsel" == trans_desc:
+                        continue
                     trans_desc = ifExceptionModifyDescription(trans_desc, trans_date.strftime("%d-%m-%Y"))
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]

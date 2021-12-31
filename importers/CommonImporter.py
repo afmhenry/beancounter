@@ -1,6 +1,9 @@
 # might try to make common helper functions here
+import re
 from decimal import Decimal
 import os
+
+import beancount.core.data
 import requests
 import feedparser
 import sys
@@ -23,6 +26,62 @@ def danishToStdDec(value):
             .replace(",", ".")
     )
 
+
+def consumeConfigProvidePostings(pre_txn, line_code_pattern, line, code_mapping):
+    result = re.search(line_code_pattern, line)
+    if result and result.group() in code_mapping:
+        line_config = dict.get(code_mapping, result.group())
+        account = line_config[0]
+        metadata = None
+        meta_contents = []
+        trans_date = None
+        for i, entry in enumerate(line_config[1]):
+            extraction = danishToStdDec(re.findall(entry[0], line)[entry[1]])
+            meta_contents.append(extraction)
+        if len(line_config[1]) == 2:
+            if result.group() == "Overført via NemKonto":
+                trans_date = (parse(
+                    datetime.datetime.strptime(str(meta_contents[1]), "%d%m%Y")
+                    .strftime("%Y-%m-%d")).date()
+                )
+            else:
+                metadata = {
+                    "calc":
+                        str(meta_contents[0]) + " DKK @ " +
+                        str(meta_contents[1]) + "%"
+                }
+        elif len(line_config[1]) == 3:
+            metadata = {
+                "calc":
+                    "(" + str(meta_contents[0]) + " - " + str(meta_contents[2]) + ") DKK @ " +
+                    str(meta_contents[1]) + "%"
+            }
+        if "Firmabidrag" in account:
+            appendPayslipPosting(pre_txn,
+                                 account.replace("Assets:Investment:", "Income:"),
+                                 meta_contents[0], metadata)
+
+        appendPayslipPosting(pre_txn, account, meta_contents[0], metadata)
+
+
+        return trans_date
+
+
+def appendPayslipPosting(pre_txn, account, value, metadata):
+    if "Income" in account:
+        value *= -1
+    pre_txn.append(
+        data.Posting(
+            account,
+            amount.Amount(
+                value,
+                "DKK"),
+            None,  # Cost or CostSpec
+            None,  # price
+            None,  # flag
+            metadata  # metadata dict
+        )
+    )
 
 def appendCommissionPosting(txn, account, commission, commission_is_negative, currency):
     if commission_is_negative:

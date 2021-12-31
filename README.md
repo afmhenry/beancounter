@@ -58,7 +58,7 @@ This can be done as frequently as you want, but I wouldn't see a need to do it m
 # Usage: 
 
 * clone the repo
-* set up a virtual python env(or not--but highly recommended)
+* set up a virtual python env(or not--but highly recommended). I did it on [pycharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html#python_create_virtual_env)
 * [populate that venv](https://stackoverflow.com/questions/41427500/creating-a-virtualenv-with-preinstalled-packages-as-in-requirements-txt) with the requirements.txt file
 * You will have to separately [install tkinter](https://askubuntu.com/questions/505141/unable-to-install-import-tkinter), as it is a c++ lib. I'm going to see if <it is viable to build a 
 different and nicer interface later...but for now this is how to do. 

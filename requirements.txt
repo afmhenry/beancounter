@@ -1,0 +1,10 @@
+PyPDF4~=1.27.0
+beancount~=2.3.4
+python-dateutil~=2.8.2
+tika~=1.24
+titlecase~=2.3
+PyPDF2~=1.26.0
+openpyxl~=3.0.9
+requests~=2.26.0
+feedparser~=6.0.8
+future~=0.18.2

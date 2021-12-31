@@ -57,6 +57,15 @@ This can be done as frequently as you want, but I wouldn't see a need to do it m
 
 # Usage: 
 
+* clone the repo
+* set up a virtual python env(or not--but highly recommended). I did it on [pycharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html#python_create_virtual_env)
+* [populate that venv](https://stackoverflow.com/questions/41427500/creating-a-virtualenv-with-preinstalled-packages-as-in-requirements-txt) with the requirements.txt file
+* You will have to separately [install tkinter](https://askubuntu.com/questions/505141/unable-to-install-import-tkinter), as it is a c++ lib. I'm going to see if <it is viable to build a 
+different and nicer interface later...but for now this is how to do. 
+* see if you can run any of the scripts. If you are using pycharm the `.run` directory contains run configurations for 
+the below-mentioned scripts.
+* Download you relevant bank files, and move them to the `data` dir
+
 * Open the scripts folder
 * Decide which operation you want to do:
   * `map.sh`: Test the purchase classifier on the bank account input file, build a mapping to be used later. 
@@ -73,6 +82,8 @@ Paths present in the scripts may need adjusting.
 
 You will also have to chmod u+x the scripts. 
 
+
+## Write your own bank's importer!
 Adding a new importer to a different bank is pretty trivial--you have several examples of how to handle different formats. Copy, paste, 
 test using run mapping script :)
 
@@ -80,7 +91,7 @@ Make sure to get the right encoding, accepted values can be found here:
 https://docs.python.org/3/library/codecs.html#encodings-and-unicode
 
 You can determine what encoding the downloaded bank file is in, by running this in the cli. 
-  
+
 ```
 >> file filename
 >> 2021-11-14.Nordnet-Depot-Transactions.csv: Little-endian UTF-16 Unicode text, with very long lines, with CRLF line terminators

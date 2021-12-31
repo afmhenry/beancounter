@@ -13,6 +13,14 @@ from importers.external import UnrealizedGainsImporter
 from importers.payslips import VismaPayslipImporter
 
 CONFIG = [
+    VismaPayslipImporter.Importer(
+        'Income:Work:GrossSalary',
+        'Assets:DanskeBank:Checking',
+        'Expenses:Tax:',
+        'Assets:Investment:Pension:',
+        'Income:Pension:',
+        'Expenses:Consumption:Lunch'
+    ),
     DanskeBankImporter.Importer('Assets:DanskeBank:Checking'),
     NordnetImporter.Importer(
         'Assets:Investment:Nordnet:Depot:Cash',
@@ -27,16 +35,7 @@ CONFIG = [
         'Income:Investment:SaxoBank:PnL:Sales',
         'Income:Investment:SaxoBank:PnL:Dividends',
         'Expenses:Tax'
-    ),
-    VismaPayslipImporter.Importer(
-        'Income:Work:GrossSalary',
-        'Assets:DanskeBank:Checking',
-        'Expenses:Tax:',
-        'Assets:Investment:Pension:',
-        'Income:Pension:',
-        'Expenses:Consumption:Lunch'
     )
-
 ]
 
 CONFIGPLACEHOLDER = [

@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
-import sys
-import re
-from beancount.core.number import D
 from beancount.ingest import importer
-from beancount.core import amount
 from beancount.core import flags
-from beancount.core import data
 
-from datetime import date
-from dateutil.parser import parse
 import datetime
 from ..CommonImporter import *
 
-from titlecase import titlecase
 
 import csv
 import os
@@ -64,8 +56,8 @@ class Importer(importer.ImporterProtocol):
 
                     # This would be a repeat since we read in payslip separately.
                     # The posting will show up there with a lot more info
-                    #if "Lønoverførsel" == trans_desc:
-                        #continue
+                    if "Lønoverførsel" == trans_desc:
+                        continue
                     trans_desc = ifExceptionModifyDescription(trans_desc, trans_date.strftime("%d-%m-%Y"))
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]

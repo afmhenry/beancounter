@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-import sys
-import re
 from openpyxl import Workbook, load_workbook
 
 from beancount.ingest import importer
@@ -46,11 +43,13 @@ class Importer(importer.ImporterProtocol):
         # I have merged multiple excel files to a single one--with multiple sheets.
         lookup_sheet = wb.get_sheet_by_name(sheet_names[2])
         lookup_closed_sheet = wb.get_sheet_by_name(sheet_names[3])
-        lookup_account_sheet = wb.get_sheet_by_name(sheet_names[4])
+        lookup_account_sheet_ASK = wb.get_sheet_by_name(sheet_names[4])
+        lookup_account_sheet_Depot = wb.get_sheet_by_name(sheet_names[5])
         destination_account = self.source_account
         lineno = 0
         commission = "0"
         total_excl_commission = "0"
+        currency = "DKK"
 
         for row in sheet.values:
             lineno += 1
@@ -102,8 +101,7 @@ class Importer(importer.ImporterProtocol):
             ticker_account = destination_account.replace("Cash", ticker)
 
             if trans_type == "Bought":
-
-                entries, known_accounts = openAccountIfMissing(
+                openAccountIfMissing(
                     entries, ticker_account, known_accounts, ticker, trans_date, meta)
 
                 # purchase posting
@@ -196,7 +194,50 @@ class Importer(importer.ImporterProtocol):
 
         # before we return--do lookup for balance transaction for ASK.
         # can eventually do the same for depot...not sure if it should be in the same importer though.
-        for lookup_row in lookup_account_sheet.values:
+
+        for i, lookup_row in enumerate(lookup_account_sheet_ASK.values):
+            if lookup_row[1] != "Posting Date" and i == 1:
+                meta = data.new_metadata("account_balance", 1)
+                balance_date = parse(datetime.datetime.strftime(lookup_row[2], "%Y-%m-%d %H:%M:%S")).date()
+                balance_amount = lookup_row[5]
+                entries.append(
+                    data.Balance(
+                        meta,
+                        balance_date + datetime.timedelta(days=1),
+                        self.source_account.replace("Depot", "ASK"),
+                        amount.Amount(D("%.2f" % balance_amount), 'DKK'),
+                        D(5),
+                        None
+                    )
+                )
+            if "Corporate Action" in lookup_row[3]:
+                desc = lookup_row[3].split(" ")[1]
+                div_date = parse(datetime.datetime.strftime(lookup_row[2], "%Y-%m-%d %H:%M:%S")).date()
+                meta = data.new_metadata("AccStatement", 1)
+
+                div_amount = D("%.2f" % lookup_row[4])
+                txn = data.Transaction(
+                    meta=meta,
+                    date=div_date,
+                    flag=flags.FLAG_OKAY,
+                    payee=desc,
+                    narration=lookup_row[3],
+                    tags=set(),
+                    links=set(),
+                    postings=[],
+                )
+                txn.postings.append(
+                    data.Posting(self.dividends_account,
+                                 amount.Amount(div_amount * -1, currency),
+                                 None, None, None, None)
+                )
+                txn.postings.append(
+                    data.Posting(self.source_account.replace("Depot", "ASK"),
+                                 amount.Amount(div_amount, currency),
+                                 None, None, None, None)
+                )
+                entries.append(txn)
+        for lookup_row in lookup_account_sheet_Depot.values:
             if lookup_row[1] != "Posting Date":
                 meta = data.new_metadata("account_balance", 1)
                 balance_date = parse(datetime.datetime.strftime(lookup_row[2], "%Y-%m-%d %H:%M:%S")).date()
@@ -204,10 +245,10 @@ class Importer(importer.ImporterProtocol):
                 entries.append(
                     data.Balance(
                         meta,
-                        balance_date,
-                        self.source_account.replace("Depot", "ASK"),
+                        balance_date + datetime.timedelta(days=1),
+                        self.source_account,
                         amount.Amount(D("%.2f" % balance_amount), 'DKK'),
-                        D(1),
+                        D(5),
                         None
                     )
                 )

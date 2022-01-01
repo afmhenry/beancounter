@@ -83,6 +83,7 @@ def appendPayslipPosting(pre_txn, account, value, metadata):
         )
     )
 
+
 def appendCommissionPosting(txn, account, commission, commission_is_negative, currency):
     if commission_is_negative:
         commission = D(commission) * -1
@@ -114,10 +115,8 @@ def appendStockPurchasePosting(txn, ticker, account, trans_date, amount_of_share
             Cost(D(share_price),
                  currency,
                  trans_date,
-                 None
-                 ),  # label--seems that  I can define lots here...todo: look into that
+                 None),  # label--seems that  I can define lots here...todo: look into that
             None,
-            None,  # price
             None,  # flag
             None  # metadata dict
         )
@@ -229,9 +228,10 @@ def getTickersWithPriceStatusInLast10Days():
         for line in reversed(lines.readlines()):
             if " price " in line:
                 line = line.split(" ")
-                last_run = parse(line[0]).date() + datetime.timedelta(days=+10)
-                if last_run > date.today():
-                    tickers.append(line[2])
+                if line[0]:
+                    last_run = parse(line[0]).date() + datetime.timedelta(days=+10)
+                    if last_run > date.today():
+                        tickers.append(line[2])
     return tickers
 
 

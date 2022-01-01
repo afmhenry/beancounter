@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from beancount.ingest import importer
 from beancount.core import flags
 from ..CommonImporter import *

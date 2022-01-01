@@ -99,7 +99,6 @@ class Importer(importer.ImporterProtocol):
                                          # might cause issues if there are close dates...we will find out.
                                          amount.Amount(balance_amt_dec + trans_amt_dec * -1, 'DKK'), None, None))
                     entries.append(txn)
-
                 # else pending purchases, will get them next file when they are ready.
 
             # At end of file, balance

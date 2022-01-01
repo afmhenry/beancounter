@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from beancount.ingest import importer
 
 from ..CommonImporter import *

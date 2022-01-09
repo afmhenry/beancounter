@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "electron": "^16.0.6",
+    "express": "^4.17.2",
+    "ffmpeg-static": "^4.4.1",
+    "node-rtsp-stream": "^0.0.9",
+    "react": "^17.0.2"
+  },
+  "name": "beancounter",
+  "description": "Beancounter GUI",
+  "version": "1.0.0",
+  "main": "electron/index.js",
+  "scripts": {
+    "start": "electron .",
+    "server": "node electron/app/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afmhenry/beancounter.git"
+  },
+  "author": "Alex",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/afmhenry/beancounter/issues"
+  },
+  "homepage": "https://github.com/afmhenry/beancounter#readme"
+}

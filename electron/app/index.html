@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    We are using Node.js <span id="node-version"></span>,
+    Chromium <span id="chrome-version"></span>,
+    and Electron <span id="electron-version"></span>.
+  </body>
+  <script type="text/javascript">
+
+    fetch("/query2",
+        {
+            "method": "GET"
+        }
+    ).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (responseJson) {
+                console.log("Connection to API created, hello " + JSON.stringify(responseJson));
+            });
+        }
+    }).catch(function (error) {
+        console.error(error);
+    });
+
+
+  </script>
+</html>

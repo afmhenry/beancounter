@@ -11,3 +11,6 @@ documents/*
 *.xlsx
 *.pdf
 *.PDF
+*.json
+node_modules
+!package.json

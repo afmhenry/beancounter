@@ -9,6 +9,9 @@
     We are using Node.js <span id="node-version"></span>,
     Chromium <span id="chrome-version"></span>,
     and Electron <span id="electron-version"></span>.
+    <div id="simplediv">
+
+    </div>
   </body>
   <script type="text/javascript">
 
@@ -19,7 +22,7 @@
     ).then(function (response) {
         if (response.ok) {
             response.json().then(function (responseJson) {
-                console.log("Connection to API created, hello " + JSON.stringify(responseJson));
+                document.getElementById("simplediv").innerHTML = JSON.stringify(responseJson["Server"].replaceAll("\n","<br>"));
             });
         }
     }).catch(function (error) {

@@ -1,5 +1,6 @@
 # Beancounter
- 
+
+My own implementation using the python library, [beancount](https://github.com/beancount).  
 
 # Current Results
 
@@ -32,12 +33,16 @@ currencies, and still be aware of the details of the holding
 
 ![Fava Income](media/fava_income.png?raw=true "Fava Assets")
 
+
+
+
 ## Support for several banks' formats
 
 * Danske Bank
 * Saxo Bank
 * Nordnet
 * Charles Schwab (WIP)
+* Mekur (WIP)
 * Visma Payslip
 
 ## Near full automation
@@ -55,14 +60,21 @@ Only manual steps are:
 This can be done as frequently as you want, but I wouldn't see a need to do it more than monthly
 
 
+# General to do:
+
+* Build as much of GUI on top as electron app:
+  * For importing/categorizing entities
+  * For reporting--a custom fava solution. Perhaps using d3 libraries? Already started this part.![](media/electron.png)
+* Find out how to handle selling at different cost basis
+
 # Usage: 
 
-* clone the repo
-* set up a virtual python env(or not--but highly recommended). I did it on [pycharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html#python_create_virtual_env)
+* Clone the repo
+* Set up a virtual python env(or not--but highly recommended). I did it on [pycharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html#python_create_virtual_env)
 * [populate that venv](https://stackoverflow.com/questions/41427500/creating-a-virtualenv-with-preinstalled-packages-as-in-requirements-txt) with the requirements.txt file
 * You will have to separately [install tkinter](https://askubuntu.com/questions/505141/unable-to-install-import-tkinter), as it is a c++ lib. I'm going to see if <it is viable to build a 
 different and nicer interface later...but for now this is how to do. 
-* see if you can run any of the scripts. If you are using pycharm the `.run` directory contains run configurations for 
+* See if you can run any of the scripts. If you are using pycharm the `.run` directory contains run configurations for 
 the below-mentioned scripts.
 * Download you relevant bank files, and move them to the `data` dir
 
@@ -129,12 +141,7 @@ Move the file and begin!
 
 I use API calls to assist the investment account's with determining unrealized gains. 
 
-# General to do:
-* find out how to handle selling at different cost basis
-* See what customization is possible with fava--what views are most valuable for me. 
-* bean-report--same as above
-* if I can avoid a monolith single beancount file--build it so there is some rolling of files
-* See what options there are for a [query interface](https://beancount.github.io/docs/beancount_query_language.html) and how that can be used to have fine tune control.
+
 
 
 

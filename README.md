@@ -59,12 +59,21 @@ Only manual steps are:
     
 This can be done as frequently as you want, but I wouldn't see a need to do it more than monthly
 
+# Electron App:
+
+![](media/electron.png)
+  
+_First version of Electron running Express_
+
+![](media/electron-react.png)
+  
+_Now with React as well_
 
 # General to do:
 
 * Build as much of GUI on top as electron app:
   * For importing/categorizing entities
-  * For reporting--a custom fava solution. Perhaps using d3 libraries? Already started this part.![](media/electron.png)
+  * For reporting--a custom fava solution. Perhaps using d3 libraries? Already started this part.
 * Find out how to handle selling at different cost basis
 
 # Usage: 

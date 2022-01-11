@@ -23,3 +23,12 @@ group by
   month, year
 order by
   year, month DESC'
+
+bean-query ../beans/alex.beancount '
+select
+  account
+where
+  account ~ "Expenses:Consumption.*"
+group by
+  account
+'

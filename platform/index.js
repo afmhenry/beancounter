@@ -1,7 +1,7 @@
 // https://github.com/electron/electron/blob/main/docs/tutorial/quick-start.md
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
-const server = require('./app/server');
+const server = require('./server');
 
 const createWindow = () => {
   const win = new BrowserWindow({

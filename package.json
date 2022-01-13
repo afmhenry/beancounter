@@ -22,7 +22,7 @@
   "scripts": {
     "client": "BROWSER=none npm start --prefix react-client",
     "server": "nodemon platform/server",
-    "dev": "concurrently  \"wait-on tcp:3000 && npm run server\"  \"npm run client\" \"wait-on tcp:3000 && electron .\""
+    "dev": "concurrently   \"npm run client\" \"wait-on tcp:3000 && electron .\" -k"
   },
   "repository": {
     "type": "git",

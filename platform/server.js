@@ -1,11 +1,13 @@
-const express     = require('express');
-const path     = require('path');
-const ffmpegPath  = require('ffmpeg-static');
-Stream            = require('node-rtsp-stream');
-const {spawn} = require('child_process');
-
+const express   = require('express');
+const path      = require('path');
+const {spawn}   = require('child_process');
+var api         = require('./api');
 
 let app = express();
+
+app.listen(5000, () => {
+  console.log(`Example app listening`)
+})
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -13,42 +15,25 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.listen(5000, () => {
-  console.log(`Example app listening`)
-})
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../client/public/index.html')))
-app.get('/test', function(req, res){
-    res.send({"Server":"Running"});
-});
-
-app.get('/query', function(req, res){
-
-  var script_response = ""
-  const script_process = spawn('python', ['test.py']);
-  script_process.stdout.on('data', function (data) {
-    console.log('Pipe data from python script ...');
-    script_response = data.toString();
-  });
-    res.send({"Server":script_response});
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../react-client/public/index.html')))
 
 
-app.get('/query2', function(req, res){
-
+app.get('/consumption', function(req, res){
   var script_response = "";
-  const script_process = spawn('bean-query',["beans/alex.beancount", "select sum(cost(position)) as total, month, year where account ~ \"Expenses:Consumption.*\" and not account ~\".*Tax.*\"  and year=2021 group by year, month order by year, month DESC"]);
+  const script_process = spawn('bean-query',["-f=csv","beans/alex.beancount", "select sum(cost(position)) as total, month, year where account ~ \"Expenses:Consumption.*\" and not account ~\".*Tax.*\"  and year=2021 group by year, month order by year, month DESC"]);
   script_process.stdout.on("data", data => {
-      res.send({"Server":data.toString()});
+    response = api.BqlToJson(data.toString());
+    res.send(response);
   });
-  
 });
+
 app.get('/accounts', function(req, res){
-
   var script_response = "";
-  const script_process = spawn('bean-query',["beans/alex.beancount", 'select account where account ~ "Expenses:Consumption.*" group by account']);
+  const script_process = spawn('bean-query',["-f=csv","beans/alex.beancount", 'select account where account ~ "Expenses:Consumption.*" group by account']);
   script_process.stdout.on("data", data => {
-      res.send({"Server":data.toString()});
+    response = api.BqlToJson(data.toString());
+    res.send(response);
   });
 
 });

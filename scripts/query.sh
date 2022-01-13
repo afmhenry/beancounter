@@ -1,4 +1,4 @@
-bean-query ../beans/alex.beancount '
+bean-query -f=csv ../beans/alex.beancount '
 select
   account, sum(cost(position)) as total
 where
@@ -6,7 +6,7 @@ where
 group by account
 order by total DESC'
 
-bean-query ../beans/alex.beancount '
+bean-query -f=csv ../beans/alex.beancount '
 select
   sum(cost(position)) as total, month, year
 where

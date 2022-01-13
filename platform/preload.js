@@ -10,7 +10,6 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${dependency}-version`, process.versions[dependency])
   }
 
-  //exec(`npm run-script dev`);
-  //exec(`npm run-script client`);
+  exec(`npm run-script server`);
 
 })

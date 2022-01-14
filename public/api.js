@@ -3,14 +3,14 @@
 module.exports = {
 
     BqlToJson : function(bql_string){
-        lines = bql_string.split(/\r?\n/);
-        keys = []
-        values = []
+        var lines = bql_string.split(/\r?\n/);
+        var keys = []
+        var values = []
         lines.forEach(function(line, i){
             if(i === 0){
                 keys= line.split(",");
             }else if(line){
-                temp = {}
+                var temp = {}
                 line.split(",").forEach(function(entry, j){
                     temp[keys[j]] =  entry.trim()
                 });

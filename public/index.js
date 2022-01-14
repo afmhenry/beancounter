@@ -1,9 +1,6 @@
 // https://github.com/electron/electron/blob/main/docs/tutorial/quick-start.md
 const { app, BrowserWindow } = require('electron')
-const { exec } = require("child_process");
-
 const path = require('path')
-const server = require('./server');
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -29,6 +26,4 @@ app.whenReady().then(() => {
 //kill process if window closed
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
-  //exec(`npm run-script kill`);
-
 })

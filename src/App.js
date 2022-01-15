@@ -1,23 +1,51 @@
-
+import React from 'react';
+import { MemoryRouter, BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Button from 'react-bootstrap/Button';
+import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
+import Nav from 'react-bootstrap/Nav';
+import NavItem from 'react-bootstrap/NavItem';
+import NavLink from 'react-bootstrap/NavLink';
+import NavContext from 'react-bootstrap/NavContext';
+import { LinkContainer } from 'react-router-bootstrap';
+import { useState } from 'react';
+
 import './App.css';
+import modules from './modules';
 
-const Header = (props) => (
-      <header>
-        <h1>{props.title}</h1>
-      </header>
-);
 
-const App = () => (
-  <Container>
-    <Row>
-      <Header title="Beancounter" />
-    </Row>
-    <Row>
-    <Header title="Beancounter2" />
-    </Row>
-  </Container>
-);
+
+function App(){
+  
+
+  return(
+    <Container fluid className="App-Container">
+        <Router>
+            <Row>
+              <h1>
+                <Nav className="App-NavBar">
+                  {modules.map(module => ( // with a name, and routes
+                    <Nav.Item key={module.name} className = "App-NavItem">
+                      <Nav.Link href={module.routeProps.path} className="App-NavLink">{module.name}</Nav.Link>
+                    </Nav.Item>
+                  ))}
+                </Nav>
+              </h1>
+              
+            </Row>
+              <Row>
+                <Routes>
+                {modules.map(module => (
+                  <Route {...module.routeProps} key={module.name} />
+                ))}
+              </Routes>
+              </Row>
+        </Router>
+    </Container>
+  )
+
+            }
 
 export default App;

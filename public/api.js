@@ -1,10 +1,10 @@
 // api.js
 const {spawn}   = require('child_process');
 
-var BqlHandler = {
+const BqlHandler = {
 
-    Create: function(req){
-        console.log(req.params);
+    Create: (req) => {
+        //console.log(req.params);
         bql =  {
             "cmd":'bean-query', 
             "args": ["-f=csv","beans/alex.beancount"]
@@ -19,41 +19,43 @@ var BqlHandler = {
         return bql;
     },
     //convert the query parameters into the relevant section of a bql statement
-    FilterToBql: function(queries, bql_base){
-        filter = ""
-        if(Object.keys(queries) !== 0){
+    FilterToBql: (queries, bql_base) => {
+        filter = "";
+        if (Object.keys(queries).length !== 0) {
             filter = "where";
-            for(var key in queries){
-                modifier = ""
-    
-                switch(key){
+            for (var key in queries) {
+                 modifier = "";
+
+                switch (key) {
                     case "FromDate":
-                        break
+                        // date>=2021-11-01
+                        break;
                     case "ToDate":
-                        break
+                        //date <= 2021-12-31
+                        break;
                     case "Exclude":
-                        modifier = " not"
+                        modifier = " not";
                     case "Include":
-                        query_values = queries[key].split(",")
-                        for(var part in query_values){
-                            filter  += modifier+" account ~'.*"+query_values[part]+".*' "
-                            if(part != query_values.length-1){
-                                filter += "and"
+                        query_values = queries[key].split(",");
+                        for (var part in query_values) {
+                            filter += modifier + " account ~'.*" + query_values[part] + ".*' ";
+                            if (Number(part) != query_values.length - 1) {
+                                filter += "and";
                             }
                         }
-                        break
+                        break;
                 }
-                delete queries[key]
-    
-                if(Object.keys(queries).length !== 0){
-                    filter += "and"
+                delete queries[key];
+
+                if (Object.keys(queries).length !== 0) {
+                    filter += "and";
                 }
             }
         }
-        return bql_base.replace("\<FILTER\> ", filter)
+        return bql_base.replace("<FILTER> ", filter);
     },
     //convert the path parameters into the relevant section of a bql statement
-    PathToBql: function(paths){
+    PathToBql: (paths) => {
         query = ""
         switch(paths[0]){
             case "accounts":
@@ -73,9 +75,8 @@ var BqlHandler = {
         }
         return query;
     },
-    //convert the 
-        //bql to json for FE consumption
-    RespToJson: function(bql_string){
+    //convert the  bql to json for FE consumption
+    RespToJson: (bql_string) => {
         lines = bql_string.toString().split(/\r?\n/);
         keys = []
         values = []
@@ -83,7 +84,7 @@ var BqlHandler = {
             if(i === 0){
                 keys= line.split(",");
             }else if(line){
-                temp = {}
+                 temp = {}
                 line.split(",").forEach(function(entry, j){
                     temp[keys[j]] =  entry.trim()
                 });
@@ -94,6 +95,25 @@ var BqlHandler = {
     }
 }
 
+const FrontEndHandler = {
+    RequestData: (info) => {
+        console.log(info)
+        console.log(new URLSearchParams(info).toString)
+        fetch("/v1/accounts?"+new URLSearchParams(info),
+        {
+            "method": "GET"
+        }
+        ).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (responseJson) {
+                    return responseJson;
+                }); 
+            }
+        }).catch(function (error) {
+            console.error(error);
+        });
+    }
+}
 
 module.exports = {
     SendRequest: function(req,res){
@@ -108,7 +128,8 @@ module.exports = {
         script_process.stdout.on("data", data => {
             res.send(BqlHandler.RespToJson(data));
         });
-    }
+    },
+    FrontEndHandler
 }
     
 

@@ -25,6 +25,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')))
 
 
 app.get('/v1/*', function(req, res){
+  console.log(typeof res)
   api.SendRequest(req,res)
 });
 

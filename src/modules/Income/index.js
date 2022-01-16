@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from "react";
 import Row from 'react-bootstrap/Row';
 
 import Helpers from '../API'
@@ -50,7 +49,7 @@ class QueryForm extends React.Component {
     }
 }
 
-  const Dashboard = () => (
+  const Income = () => (
     <Row>    
         <QueryForm />
     </Row>
@@ -58,9 +57,9 @@ class QueryForm extends React.Component {
 
 export default {
     routeProps: {
-        path: '/dashboard',
+        path: '/income',
         exact: true,
-        element: Dashboard(),
+        element: Income(),
     },
-    name: 'Dashboard',
+    name: 'Income',
 };

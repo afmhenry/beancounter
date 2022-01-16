@@ -1,9 +1,12 @@
 const express   = require('express');
 const path      = require('path');
-const {spawn}   = require('child_process');
 var api         = require('./api');
+const BodyParser = require('body-parser');
+
 
 let app = express();
+
+app.use(BodyParser.json());
 
 app.listen(5000, () => {
   console.log(`Example app listening`)
@@ -18,24 +21,14 @@ app.use(function(req, res, next) {
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')))
 
+//  const script_process = spawn('bean-query',["-f=csv","beans/alex.beancount", "select sum(cost(position)) as total, month, year where account ~ \"Expenses:Consumption.*\" and not account ~\".*Tax.*\"  and year=2021 group by year, month order by year, month DESC"]);
 
-app.get('/consumption', function(req, res){
-  const script_process = spawn('bean-query',["-f=csv","beans/alex.beancount", "select sum(cost(position)) as total, month, year where account ~ \"Expenses:Consumption.*\" and not account ~\".*Tax.*\"  and year=2021 group by year, month order by year, month DESC"]);
-  script_process.stdout.on("data", data => {
-    var response = api.BqlToJson(data.toString());
-    res.send(response);
-  });
+
+app.get('/v1/*', function(req, res){
+  console.log(typeof res)
+  api.SendRequest(req,res)
 });
 
-app.get('/accounts', function(req, res){
-  var script_response = "";
-  const script_process = spawn('bean-query',["-f=csv","beans/alex.beancount", 'select account where account ~ "Expenses:Consumption.*" group by account']);
-  script_process.stdout.on("data", data => {
-    var response = api.BqlToJson(data.toString());
-    res.send(response);
-  });
-
-});
 
 // Handle stop signals
 const exitfn = function () {

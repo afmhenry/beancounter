@@ -1,34 +1,6 @@
 bean-query -f=csv ../beans/alex.beancount '
-select
-  account, sum(cost(position)) as total
-where
-  account ~ "Expenses.*" and not account ~".*Tax.*"  and year=2021
-group by account
-order by total DESC'
-
-bean-query -f=csv ../beans/alex.beancount '
-select
-  sum(cost(position)) as total, month, year
-where
-  account ~ "Expenses:Consumption.*" and not account ~".*Tax.*"  and year=2021
-group by year, month
-order by year, month DESC'
-
-bean-query ../beans/alex.beancount '
-select
-  sum(cost(position)) as total, month, year
-where
-  account ~ "Expenses:Consumption.*" and not account ~".*Tax.*"  and year=2021
-group by
-  month, year
-order by
-  year, month DESC'
-
-bean-query ../beans/alex.beancount '
-select
-  account
-where
-  account ~ "Expenses:Consumption.*"
-group by
-  account
+SELECT account, sum(position) as total, year
+WHERE account ~ "Income" and not account ~".*Unrealized" and year=2021
+GROUP BY account, year
+ORDER BY account DESC;
 '

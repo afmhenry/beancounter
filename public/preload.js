@@ -1,4 +1,3 @@
-const { exec } = require("child_process");
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -9,7 +8,4 @@ window.addEventListener('DOMContentLoaded', () => {
   for (const dependency of ['chrome', 'node', 'electron']) {
     replaceText(`${dependency}-version`, process.versions[dependency])
   }
-
-  exec(`npm run-script server`);
-
 })

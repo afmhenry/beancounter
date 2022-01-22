@@ -21,7 +21,7 @@ function App(){
   
 
   return(
-    <Container fluid className="App-Container">
+    <Container className="App-NavContainer">
         <Router>
             <Row>
               <h1>
@@ -33,15 +33,12 @@ function App(){
                   ))}
                 </Nav>
               </h1>
-              
             </Row>
-              <Row>
-                <Routes>
-                {modules.map(module => (
-                  <Route {...module.routeProps} key={module.name} />
-                ))}
-              </Routes>
-              </Row>
+              <Routes>
+              {modules.map(module => (
+                <Route {...module.routeProps} key={module.name} />
+              ))}
+            </Routes>
         </Router>
     </Container>
   )

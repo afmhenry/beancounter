@@ -16,6 +16,14 @@
   color: white;
 }
 
+.App-Nav-Container {
+  min-width: 100%;
+  padding: 0 0;
+  margin-right: 0;
+  margin-left: 0;
+  background-color: #c2c5ca;
+}
+
 .App-Container {
   min-width: 100%;
   padding: 0 0;

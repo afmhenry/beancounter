@@ -1,6 +1,1 @@
-bean-query -f=csv ../beans/alex.beancount '
-SELECT account, sum(position) as total, year
-WHERE account ~ "Income" and not account ~".*Unrealized" and year=2021
-GROUP BY account, year
-ORDER BY account DESC;
-'
+bean-query -f=csv ../beans/alex.beancount "select sum(position) as total, date where account ~'.*Expense.*' and not account ~'.*Tax.*' and (month=12 or month=11 or month=10) group by date"

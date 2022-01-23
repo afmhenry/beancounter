@@ -89,7 +89,7 @@ _First version of Electron running Express_
 * Build as much of GUI on top as electron app:
   * For importing/categorizing entities
   * Complete a nice way to visualize the bql queries
-  * Find out how to handle selling at different cost basis. '
+  * Find out how to handle selling at different cost basis.
     * This solution probably includes beanquery
   * 
 

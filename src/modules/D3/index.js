@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import Helpers from '../API'
 import Row from 'react-bootstrap/Row';
 
-
+//https://www.d3-graph-gallery.com/graph/stackedarea_basic.html
 const LineChart = (input) => {
     //document.getElementById("App-Container").getBoundingClientRect();
     const dimensions = {

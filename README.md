@@ -61,20 +61,37 @@ This can be done as frequently as you want, but I wouldn't see a need to do it m
 
 # Electron App:
 
-![](media/electron.png)
-  
-_First version of Electron running Express_
+Here you can see the visual progression of implementing an interface. 
 
+
+![](media/electron-and-d3.png)
+
+_With D3 now being supplied by an API making BQL queries_
+
+<details>
+<summary>Previous Statuses</summary>
+
+January 11th 2022
 ![](media/electron-react.png)
   
 _Now with React as well_
 
+January 10th 2022
+![](media/electron.png)
+  
+_First version of Electron running Express_
+</details>
+
 # General to do:
 
+* Build a robust API to make BQL queries to support use cases. 
+  * This is in progress, but has a long way to go before I would call it robust. 
 * Build as much of GUI on top as electron app:
   * For importing/categorizing entities
-  * For reporting--a custom fava solution. Perhaps using d3 libraries? Already started this part.
-* Find out how to handle selling at different cost basis
+  * Complete a nice way to visualize the bql queries
+  * Find out how to handle selling at different cost basis. '
+    * This solution probably includes beanquery
+  * 
 
 # Usage: 
 

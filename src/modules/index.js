@@ -1,10 +1,12 @@
 import Dashboard from './Dashboard';
 import Welcome from './Welcome';
-import Income from './Income'
+import Expenses from './Expenses'
+import BarChart from './D3';
 
 
 export default [
     Welcome,
     Dashboard,
-    Income
+    Expenses
+    //BarChart
 ];

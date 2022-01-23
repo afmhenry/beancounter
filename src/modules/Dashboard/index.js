@@ -1,18 +1,16 @@
 import React from 'react';
-import { useState } from "react";
 import Row from 'react-bootstrap/Row';
 
 import Helpers from '../API'
 
-
-class QueryForm extends React.Component {
+class QueryForm1 extends React.Component {
 
 
     constructor(props) {
         super(props);
         this.state = {
-          Include: "",
-          Exclude: ""
+          Include1: "",
+          Exclude1: ""
         };
     
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -38,11 +36,11 @@ class QueryForm extends React.Component {
             <form onSubmit={this.handleSubmit}>
             <label>
                 Include:
-                <input type="text" name="Include" value={this.state.Include} onChange={this.handleInputChange} />
+                <input type="text" name="Include" value={this.state.Include1} onChange={this.handleInputChange} />
             </label>
             <label>
                 Exclude:
-                <input type="text" name="Exclude" value={this.state.Exclude} onChange={this.handleInputChange} />
+                <input type="text" name="Exclude" value={this.state.Exclude1} onChange={this.handleInputChange} />
             </label>
             <input type="submit" value="Submit" />
             </form>
@@ -50,9 +48,9 @@ class QueryForm extends React.Component {
     }
 }
 
-  const Dashboard = () => (
+const Dashboard = () => (
     <Row>    
-        <QueryForm />
+        <QueryForm1 />
     </Row>
 );
 

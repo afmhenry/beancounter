@@ -1,23 +1,23 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
-import BarChart from '../D3'
+import LineChart from '../D3'
 import Container from 'react-bootstrap/Container';
 
 const RequestInput={"Include":"Expenses","Exclude":"Tax", "Year": "2021"};
 
-function Income(){
+function Expenses(){
   return (
     <Container className="App-Container">
-        <BarChart  {...RequestInput}/>
+        <LineChart  {...RequestInput}/>
     </Container>
   );
 }
 
 export default {
     routeProps: {
-        path: '/income',
+        path: '/expenses',
         exact: true,
-        element: Income()
+        element: Expenses()
     },
-    name: 'Income'
+    name: 'Expenses'
 };

@@ -4,7 +4,7 @@ import Helpers from '../API'
 import Row from 'react-bootstrap/Row';
 
 
-const BarChart = (input) => {
+const LineChart = (input) => {
     //document.getElementById("App-Container").getBoundingClientRect();
     const dimensions = {
         width: 600,
@@ -100,4 +100,4 @@ const BarChart = (input) => {
 }
 
 
-export default BarChart
+export default LineChart

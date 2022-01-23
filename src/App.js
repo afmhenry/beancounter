@@ -21,28 +21,27 @@ function App(){
   
 
   return(
-    <Container className="App-NavContainer">
-        <Router>
-            <Row>
-              <h1>
-                <Nav className="App-NavBar">
+    <Container id="Parent" fluid className="App-NavContainer g-0">
+      <Row className="g-0">
+      <Router>
+              <Nav className="App-NavBar">
                   {modules.map(module => ( // with a name, and routes
                     <Nav.Item key={module.name} className = "App-NavItem">
                       <Nav.Link href={module.routeProps.path} className="App-NavLink">{module.name}</Nav.Link>
                     </Nav.Item>
                   ))}
                 </Nav>
-              </h1>
-            </Row>
               <Routes>
               {modules.map(module => (
                 <Route {...module.routeProps} key={module.name} />
               ))}
             </Routes>
         </Router>
+      </Row>
+
     </Container>
   )
 
-            }
+}
 
 export default App;

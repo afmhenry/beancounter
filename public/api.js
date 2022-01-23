@@ -2,6 +2,7 @@
 const { spawn } = require('child_process');
 
 const BqlHandler = {
+    //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
 
     Create: (req) => {
         var bql = {
@@ -60,7 +61,7 @@ const BqlHandler = {
                 }
             }
         }
-        resp_bql_base = bql_base.replace("<FILTER> ", filter);
+        var resp_bql_base = bql_base.replace("<FILTER> ", filter);
         return resp_bql_base
     },
     //convert the path parameters into the relevant section of a bql statement
@@ -77,19 +78,23 @@ const BqlHandler = {
                 }
                 break;
             case "positions":
-                query = "select sum(position) as total, date <FILTER> group by date"
+                query = "select sum(position) as total, year, month <FILTER> group by year, month"
                 break;
         } 
         return query;
     },
     //convert the  bql to json for FE consumption
     RespToJson: (bql_string) => {
+
         var lines = bql_string.toString().split(/\r?\n/);
         var keys = []
         var values = []
         lines.forEach(function (line, i) {
             if (i === 0) {
                 keys = line.split(",");
+                keys.forEach(function(value,index){
+                    //might need this later.
+                });
             } else if (line) {
                 var temp = {}
                 line.split(",").forEach(function (entry, j) {
@@ -122,8 +127,9 @@ const FrontEndHandler = {
 
 module.exports = {
     SendRequest: function (req, res) {
+        console.log("Request: params-",req.params," query-",req.query)
         var bql = BqlHandler.Create(req);
-        console.log(bql)
+        console.log("Query: ",bql.args[2].toString())
         var script_process = spawn(bql.cmd, bql.args);
         var output = "";
         script_process.stdout.setEncoding('utf8');

@@ -35,8 +35,8 @@ CONFIG = [
         'Income:Investment:SaxoBank:PnL:Sales',
         'Income:Investment:SaxoBank:PnL:Dividends',
         'Expenses:Tax'
-    ),
-    UnrealizedGainsImporter.Importer("No input needed right now")
+    )#,
+    #UnrealizedGainsImporter.Importer("No input needed right now")
 ]
 
 CONFIGPLACEHOLDER = [

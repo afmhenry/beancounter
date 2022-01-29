@@ -97,7 +97,7 @@ class Importer(importer.ImporterProtocol):
                                          self.account,
                                          # must subtract initial cost to have "before" picture
                                          # might cause issues if there are close dates...we will find out.
-                                         amount.Amount(balance_amt_dec + trans_amt_dec * -1, 'DKK'), None, None))
+                                         amount.Amount(balance_amt_dec + trans_amt_dec * -1, 'DKK'), D(5), None))
                     entries.append(txn)
                 # else pending purchases, will get them next file when they are ready.
 
@@ -106,5 +106,5 @@ class Importer(importer.ImporterProtocol):
             entries.append(
                 data.Balance(meta, trans_date + datetime.timedelta(days=1),
                              self.account,
-                             amount.Amount(balance_amt_dec, 'DKK'), None, None))
+                             amount.Amount(balance_amt_dec, 'DKK'), D(5), None))
         return entries

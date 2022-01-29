@@ -3,7 +3,7 @@ import Row from 'react-bootstrap/Row';
 import LineChart from '../D3'
 import Container from 'react-bootstrap/Container';
 
-const RequestInput={"Include":"Expenses","Exclude":"Tax", "Year": "2021"};
+const RequestInput={"Include":"Expenses","Exclude":"Tax,Invest", "Year": "2022,2021"};
 
 function Expenses(){
   return (

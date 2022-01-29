@@ -72,11 +72,13 @@ _With D3 now being supplied by an API making BQL queries_
 <summary>Previous Statuses</summary>
 
 January 11th 2022
+
 ![](media/electron-react.png)
   
 _Now with React as well_
 
 January 10th 2022
+
 ![](media/electron.png)
   
 _First version of Electron running Express_

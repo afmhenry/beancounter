@@ -171,10 +171,9 @@ def getCurrentStockPrice(ticker):
             price_url = "eod"
             price_parameters = {'access_key': access_key, "symbols": option["symbol"]}
             prices = getAPI(base_url + price_url, price_parameters)
-            print(prices[0])
             close_price = Decimal(prices[0].get("close")) * 1
             close_date = prices[0].get("date")
-
+            # todo: handle errors in this api better.
             # if the ticker is on german bourse, convert to dkk from eur
             if option["symbol"].split(".")[1] == "XETRA":
                 close_price *= convertInputCurrToDKK("EUR")

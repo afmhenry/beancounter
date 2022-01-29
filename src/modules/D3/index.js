@@ -28,7 +28,6 @@ const LineChart = (input) => {
             //todo: unhack api to return numbers and currency seperate
             d.total = +d.total.split(" ")[0];
             d.date  = parseDate(d.year+"-"+d.month);
-            console.log(d)
         });
 
         console.log(data.map(function(d) { return d.date; }))
@@ -56,37 +55,18 @@ const LineChart = (input) => {
             .attr("transform", 
                 "translate(" + margin.left + "," + margin.top + ")");
 
-        // get the data
-        // format the data
-
-        // Scale the range of the data in the domains
-        
-        
-
         // append the rectangles for the bar chart
         svg.append("path")
             .data([data])
             .attr("class", "line")
             .attr("d", line);
-        /*svg.selectAll(".bar")
-            .data(data)
-            .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return x(d.date); })
-            .attr("width", width/data.length-1)
-            //.attr("width", x.bandwidth())
-            .attr("y", function(d) { return y(d.total); })
-            .attr("height", function(d) { return height - y(d.total); });*/
 
-        // add the x Axis
-        //todo, make the axis not horrible
         var xAxis = d3.axisBottom(x);
 
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis.ticks(d3.timeMonth,1).tickFormat(formatDate));
 
-        // add the y Axis
         svg.append("g")
             .call(d3.axisLeft(y));
     });

@@ -171,6 +171,7 @@ def getCurrentStockPrice(ticker):
             price_url = "eod"
             price_parameters = {'access_key': access_key, "symbols": option["symbol"]}
             prices = getAPI(base_url + price_url, price_parameters)
+            print(prices[0])
             close_price = Decimal(prices[0].get("close")) * 1
             close_date = prices[0].get("date")
 
@@ -202,6 +203,8 @@ def getAPI(url, params):
         response = request.json()
         return response.get("data")
     else:
+        print(request.status_code)
+        print(request.json())
         return ""
 
 

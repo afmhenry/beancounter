@@ -38,10 +38,8 @@ function App(){
             </Routes>
         </Router>
       </Row>
-
     </Container>
   )
-
 }
 
 export default App;

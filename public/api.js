@@ -145,6 +145,7 @@ module.exports = {
         }); 
         //send when stdout is done
         script_process.stdout.on("close", data => {
+            console.log("Query complete, ", output.length, " rows");
             res.send(BqlHandler.RespToJson(output));
         }); 
     },

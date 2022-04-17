@@ -2,22 +2,24 @@
   "name": "vue-express",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "proxy": "http://localhost:5000",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "nodemon src/service",
-    "dev": "concurrently -k \"npm run server\" \"npm run serve\" --kill-others "
+    "dev": "concurrently -k \"npm run server\" \"npm run serve\" --kill-others ",
+    "server": "nodemon src/service"
   },
   "dependencies": {
+    "@mdi/font": "5.9.55",
     "body-parser": "^1.20.0",
     "concurrently": "^7.1.0",
     "core-js": "^3.8.3",
     "express": "^4.17.3",
     "nodemon": "^2.0.15",
-    "vue": "^3.2.13"
+    "roboto-fontface": "*",
+    "vue": "^3.2.13",
+    "vuetify": "^3.0.0-beta.0",
+    "webfontloader": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -26,7 +28,11 @@
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "sass": "^1.38.0",
+    "sass-loader": "^10.0.0",
+    "vue-cli-plugin-vuetify": "~2.4.8",
+    "vuetify-loader": "^2.0.0-alpha.0"
   },
   "eslintConfig": {
     "root": true,
@@ -47,5 +53,7 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "proxy": "http://localhost:5000",
+  "type": "module"
 }

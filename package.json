@@ -2,13 +2,21 @@
   "name": "vue-express",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "proxy": "http://localhost:5000",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "server": "nodemon src/service",
+    "dev": "concurrently -k \"npm run server\" \"npm run serve\" --kill-others "
   },
   "dependencies": {
+    "body-parser": "^1.20.0",
+    "concurrently": "^7.1.0",
     "core-js": "^3.8.3",
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15",
     "vue": "^3.2.13"
   },
   "devDependencies": {

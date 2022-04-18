@@ -46,8 +46,6 @@ process.on("SIGTERM", exitfn);
 
 //todo: move this to separate file...but do it well. 
 
-
-
 const BqlHandler = {
     //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
 
@@ -189,14 +187,12 @@ const BqlHandler = {
 const CategoryHandler = {
     SpawnChildProcess: (res) => {
         try {
+            //todo: start or map? Can I make accounts on the fly?
             var script_process = spawn("./scripts/map.sh");
-            return res.send({ "foo": "bar" })
+            return res.send({ "status": "started" })
         } catch (error) {
             console.error("category", error)
+            return res.send({ "status": "failed" })
         }
-
-
-
-
     }
 }

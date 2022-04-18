@@ -8,7 +8,6 @@
 
 <script>
 import axios from "axios";
-
 const client = axios.create({
   baseURL: "http://localhost:5000",
   timeout: 5000,
@@ -19,8 +18,11 @@ export default {
 
   data: () => ({}),
   methods: {
-    RunCategorize: function () {
-      client.post(`/categorize/run`).then((result) => result.data);
+    RunCategorize: async function () {
+      const response = await client
+        .post(`/categorize/run`)
+        .then((result) => result.data);
+      console.log(response);
     },
   },
 };

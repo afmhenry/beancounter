@@ -42,13 +42,16 @@ class Importer(importer.ImporterProtocol):
                 # the fools at Danskbank made a breaking change on the file, so I have to offset....
                 i = 2
                 if "Udført" in row[4+i]:
-                    trans_date = datetime.datetime.strptime(row[0], "%d.%m.%Y").strftime("%Y-%m-%d")
+                    trans_date = datetime.datetime.strptime(
+                        row[0], "%d.%m.%Y").strftime("%Y-%m-%d")
                     trans_date = parse(trans_date).date()
                     trans_desc = row[1+i]
-                    trans_amt = float(row[2+i].replace(".", "").replace(",", "."))
+                    trans_amt = float(
+                        row[2+i].replace(".", "").replace(",", "."))
                     trans_amt = '{:.2f}'.format(trans_amt)
                     trans_amt_dec = D(trans_amt)
-                    balance_amt = float(row[3+i].replace(".", "").replace(",", "."))
+                    balance_amt = float(
+                        row[3+i].replace(".", "").replace(",", "."))
                     balance_amt = '{:.2f}'.format(balance_amt)
                     balance_amt_dec = D(balance_amt)
 
@@ -58,10 +61,16 @@ class Importer(importer.ImporterProtocol):
                     # The posting will show up there with a lot more info
                     if "Lønoverførsel" == trans_desc:
                         continue
-                    trans_desc = ifExceptionModifyDescription(trans_desc, trans_date.strftime("%d-%m-%Y"))
+                    trans_desc = ifExceptionModifyDescription(
+                        trans_desc, trans_date.strftime("%d-%m-%Y"))
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
+                        print(trans_desc)
+                        postAPI("http://localhost:5000/categorize", trans_desc)
+
+                        continue
+
                         mappings = formatWindow(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
                                                 account_by_type[1])
                         destination_account = mappings[0][mappings[1]]
@@ -85,7 +94,8 @@ class Importer(importer.ImporterProtocol):
                     )
                     txn.postings.append(
                         data.Posting(destination_account,
-                                     amount.Amount(D(trans_amt_dec * -1), 'DKK'),
+                                     amount.Amount(
+                                         D(trans_amt_dec * -1), 'DKK'),
                                      None, None, None, None)
                     )
 

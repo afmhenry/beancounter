@@ -22,8 +22,8 @@ import tkinter as tk
 def danishToStdDec(value):
     return Decimal(
         value.replace("-", "")
-            .replace(".", "")
-            .replace(",", ".")
+        .replace(".", "")
+        .replace(",", ".")
     )
 
 
@@ -58,11 +58,11 @@ def consumeConfigProvidePostings(pre_txn, line_code_pattern, line, code_mapping)
             }
         if "Firmabidrag" in account:
             appendPayslipPosting(pre_txn,
-                                 account.replace("Assets:Investment:", "Income:"),
+                                 account.replace(
+                                     "Assets:Investment:", "Income:"),
                                  meta_contents[0], metadata)
 
         appendPayslipPosting(pre_txn, account, meta_contents[0], metadata)
-
 
         return trans_date
 
@@ -169,7 +169,8 @@ def getCurrentStockPrice(ticker):
     for option in options:
         if option["symbol"].split(".")[1] in ["XETRA", "XCSE"]:
             price_url = "eod"
-            price_parameters = {'access_key': access_key, "symbols": option["symbol"]}
+            price_parameters = {'access_key': access_key,
+                                "symbols": option["symbol"]}
             prices = getAPI(base_url + price_url, price_parameters)
             close_price = Decimal(prices[0].get("close")) * 1
             close_date = prices[0].get("date")
@@ -207,6 +208,17 @@ def getAPI(url, params):
         return ""
 
 
+def postAPI(url, value):
+    request = requests.post(url, json={"message": value})
+    if request.status_code == 200:
+        response = request.json()
+        return response.get("data")
+    else:
+        print(request.status_code)
+        print(request.json())
+        return ""
+
+
 def stringToDecimalFromDA(str_num):
     if str_num != '':
         return Decimal(str_num.replace(".", "").replace(",", "."))
@@ -231,7 +243,8 @@ def getTickersWithPriceStatusInLast10Days():
             if " price " in line:
                 line = line.split(" ")
                 if line[0]:
-                    last_run = parse(line[0]).date() + datetime.timedelta(days=+10)
+                    last_run = parse(line[0]).date() + \
+                        datetime.timedelta(days=+10)
                     if last_run > date.today():
                         tickers.append(line[2])
     return tickers
@@ -307,7 +320,8 @@ def formatWindow(root, description, cost, date_of_trans, purchase_mapping, expen
     drop2 = tk.OptionMenu(root, clicked2, *income_mapping)
     drop2.pack()
 
-    button = tk.Button(root, name="continue", text="Select", command=getInput, width=30)
+    button = tk.Button(root, name="continue", text="Select",
+                       command=getInput, width=30)
     button.pack()
     root.mainloop()
 

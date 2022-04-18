@@ -2,7 +2,6 @@ import express from 'express';
 import BodyParser from 'body-parser';
 import { spawn } from 'child_process';
 
-//import getOpenapiService from "./services/openapiService";
 
 let app = express();
 let port = 5000
@@ -12,15 +11,21 @@ app.use(BodyParser.json());
 app.listen(port, () => {
     console.log(`Express listening on port ${port}`)
 })
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
-app.get('/*', function (req, res) {
+app.get('/api/*', function (req, res) {
     console.log(typeof res)
-    SendRequest(req,res)
+    SendRequest(req, res)
+});
+
+app.post('/categorize', function (req, res) {
+    console.log(req.body)
+    res.send({ "foo": "bar" })
 });
 
 
@@ -32,7 +37,35 @@ process.on("SIGINT", exitfn);
 process.on("SIGTERM", exitfn);
 
 
-//todo: move this to separate file...but well. 
+//todo: move this to separate file...but do it well. 
+
+function SendRequest(req, res) {
+    console.log("Request: params-", req.params, " query-", req.query)
+    var bql = BqlHandler.SpawnChildProcess(req);
+    console.log("Query: ", bql.args[2].toString())
+    var script_process = spawn(bql.cmd, bql.args);
+    var output = "";
+    script_process.stdout.setEncoding('utf8');
+
+
+    //catch if it fails...rare, error may manifest in response instead. 
+    //so some of that is handled in the RespToJson too. 
+    script_process.on('error', (err) => {
+        console.error('Failed to start subprocess.', err);
+    });
+
+    //gather stdout, since it could go a while
+    script_process.stdout.on("data", data => {
+        data = data.toString()
+        output += data;
+    });
+
+    //send when stdout is done
+    script_process.stdout.on("close", data => {
+        console.log("Query complete, ", output.length, " rows");
+        res.send(BqlHandler.RespToJson(output));
+    });
+}
 
 const BqlHandler = {
     //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
@@ -40,7 +73,7 @@ const BqlHandler = {
     SpawnChildProcess: (req) => {
         var bql = {
             "cmd": 'bean-query',
-            "args": ["-f=csv", "../beancounter/beans/alex.beancount"]
+            "args": ["-f=csv", "beans/alex.beancount"]
         }
         //apply operations from path
         var bql_base = BqlHandler.PathToBql(req.params);
@@ -102,7 +135,7 @@ const BqlHandler = {
         var query = ""
         switch (paths[0]) {
             case "accounts":
-                console.log("here",paths)
+                console.log("here", paths)
                 if (paths.length == 2) {
                     query = "select account";
                     //get info on certain account
@@ -119,49 +152,32 @@ const BqlHandler = {
     },
     //convert the  bql to json for FE consumption
     RespToJson: (bql_string) => {
+        try {
+            var lines = bql_string.toString().split(/\r?\n/);
+            var keys = []
+            var values = []
+            lines.forEach(function (line, i) {
+                if (i === 0) {
+                    keys = line.split(",");
+                    keys.forEach(function (value, index) {
+                        //might need this later.
+                    });
+                } else if (line) {
+                    var temp = {}
+                    line.split(",").forEach(function (entry, j) {
+                        temp[keys[j]] = entry.trim()
+                    });
+                    values[i - 1] = temp;
+                }
+            });
+            return values;
+        } catch (error) {
+            console.log("Process output invalid", bql_string, error)
+        }
 
-        var lines = bql_string.toString().split(/\r?\n/);
-        var keys = []
-        var values = []
-        lines.forEach(function (line, i) {
-            if (i === 0) {
-                keys = line.split(",");
-                keys.forEach(function (value, index) {
-                    //might need this later.
-                });
-            } else if (line) {
-                var temp = {}
-                line.split(",").forEach(function (entry, j) {
-                    temp[keys[j]] = entry.trim()
-                });
-                values[i - 1] = temp;
-            }
-        });
-        return values;
     }
 }
 
+const CategoryHandler = {
 
-function SendRequest(req, res){
-    console.log("Request: params-", req.params, " query-", req.query)
-    var bql = BqlHandler.SpawnChildProcess(req);
-    console.log("Query: ", bql.args[2].toString())
-    var script_process = spawn(bql.cmd, bql.args);
-    var output = "";
-    script_process.stdout.setEncoding('utf8');
-
-    script_process.on('error', (err) => {
-        console.error('Failed to start subprocess.', err);
-    });
-
-    //gather stdout, since it could go a while
-    script_process.stdout.on("data", data => {
-        data = data.toString()
-        output += data;
-    });
-    //send when stdout is done
-    script_process.stdout.on("close", data => {
-        console.log("Query complete, ", output.length, " rows");
-        res.send(BqlHandler.RespToJson(output));
-    });
 }

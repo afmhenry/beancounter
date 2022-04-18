@@ -20,12 +20,19 @@ app.use(function (req, res, next) {
 
 app.get('/api/*', function (req, res) {
     console.log(typeof res)
-    SendRequest(req, res)
+    BqlHandler.SendRequest(req, res)
 });
 
-app.post('/categorize', function (req, res) {
+
+
+//Category API's
+app.post('/categorize/this', function (req, res) {
     console.log(req.body)
     res.send({ "foo": "bar" })
+});
+
+app.post('/categorize/run', function (req, res) {
+    CategoryHandler.SpawnChildProcess(res)
 });
 
 
@@ -38,34 +45,6 @@ process.on("SIGTERM", exitfn);
 
 
 //todo: move this to separate file...but do it well. 
-
-function SendRequest(req, res) {
-    console.log("Request: params-", req.params, " query-", req.query)
-    var bql = BqlHandler.SpawnChildProcess(req);
-    console.log("Query: ", bql.args[2].toString())
-    var script_process = spawn(bql.cmd, bql.args);
-    var output = "";
-    script_process.stdout.setEncoding('utf8');
-
-
-    //catch if it fails...rare, error may manifest in response instead. 
-    //so some of that is handled in the RespToJson too. 
-    script_process.on('error', (err) => {
-        console.error('Failed to start subprocess.', err);
-    });
-
-    //gather stdout, since it could go a while
-    script_process.stdout.on("data", data => {
-        data = data.toString()
-        output += data;
-    });
-
-    //send when stdout is done
-    script_process.stdout.on("close", data => {
-        console.log("Query complete, ", output.length, " rows");
-        res.send(BqlHandler.RespToJson(output));
-    });
-}
 
 const BqlHandler = {
     //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
@@ -175,9 +154,45 @@ const BqlHandler = {
             console.log("Process output invalid", bql_string, error)
         }
 
+    }, SendRequest: (req, res) => {
+        console.log("Request: params-", req.params, " query-", req.query)
+        var bql = BqlHandler.SpawnChildProcess(req);
+        console.log("Query: ", bql.args[2].toString())
+        var script_process = spawn(bql.cmd, bql.args);
+        var output = "";
+        script_process.stdout.setEncoding('utf8');
+
+
+        //catch if it fails...rare, error may manifest in response instead. 
+        //so some of that is handled in the RespToJson too. 
+        script_process.on('error', (err) => {
+            console.error('Failed to start subprocess.', err);
+        });
+
+        //gather stdout, since it could go a while
+        script_process.stdout.on("data", data => {
+            data = data.toString()
+            output += data;
+        });
+
+        //send when stdout is done
+        script_process.stdout.on("close", data => {
+            console.log("Query complete, ", output.length, " rows");
+            res.send(BqlHandler.RespToJson(output));
+            return
+        });
     }
 }
 
 const CategoryHandler = {
-
+    SpawnChildProcess: (res) => {
+        try {
+            //todo: start or map? Can I make accounts on the fly?
+            var script_process = spawn("./scripts/map.sh");
+            return res.send({ "status": "started" })
+        } catch (error) {
+            console.error("category", error)
+            return res.send({ "status": "failed" })
+        }
+    }
 }

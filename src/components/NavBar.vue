@@ -82,4 +82,6 @@ export default {
 //mdi-chart-scatter-plot-hexbin
 //mdi-folder-multiple-plus-outline
 //mdi-tab-search
+
+//https://pictogrammers.github.io/@mdi/font/6.5.95/
 </script>

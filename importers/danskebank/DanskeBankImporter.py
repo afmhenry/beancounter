@@ -69,7 +69,6 @@ class Importer(importer.ImporterProtocol):
                         print(trans_desc)
                         postAPI(
                             "http://localhost:5000/categorize/this", trans_desc)
-
                         continue
 
                         mappings = formatWindow(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],

@@ -76,6 +76,9 @@ January 11th 2022
 ![](media/electron-react.png)
   
 _Now with React as well_
+I think ill try to replace this with vue, much simpler fw. 
+
+Have to think and make a plan for it. 
 
 January 10th 2022
 
@@ -93,7 +96,7 @@ _First version of Electron running Express_
   * Complete a nice way to visualize the bql queries
   * Find out how to handle selling at different cost basis.
     * This solution probably includes beanquery
-  * 
+
 
 # Usage: 
 

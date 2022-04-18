@@ -1,13 +1,46 @@
-// api.js
-const { spawn } = require('child_process');
+import express from 'express';
+import BodyParser from 'body-parser';
+import { spawn } from 'child_process';
+
+//import getOpenapiService from "./services/openapiService";
+
+let app = express();
+let port = 5000
+
+app.use(BodyParser.json());
+
+app.listen(port, () => {
+    console.log(`Express listening on port ${port}`)
+})
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+app.get('/*', function (req, res) {
+    console.log(typeof res)
+    SendRequest(req,res)
+});
+
+
+// Handle stop signals
+const exitfn = function () {
+    process.exit(0);
+};
+process.on("SIGINT", exitfn);
+process.on("SIGTERM", exitfn);
+
+
+//todo: move this to separate file...but well. 
 
 const BqlHandler = {
     //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
 
-    Create: (req) => {
+    SpawnChildProcess: (req) => {
         var bql = {
             "cmd": 'bean-query',
-            "args": ["-f=csv", "beans/alex.beancount"]
+            "args": ["-f=csv", "../beancounter/beans/alex.beancount"]
         }
         //apply operations from path
         var bql_base = BqlHandler.PathToBql(req.params);
@@ -25,11 +58,11 @@ const BqlHandler = {
             filter = "where";
             for (var key in queries) {
                 var modifier = "";
-                switch (key) {                    
+                switch (key) {
                     case "Month":
                     case "Year":
                         //support multiple entries in month or year, perhaps ranges would be more elegant...
-                        filter += " ("+key.toLowerCase()+"=" + queries[key].replaceAll(","," or "+key.toLowerCase()+"=") + ") ";
+                        filter += " (" + key.toLowerCase() + "=" + queries[key].replaceAll(",", " or " + key.toLowerCase() + "=") + ") ";
                         break;
                     case "ToDate":
                         //date <= 2021-12-31
@@ -38,9 +71,9 @@ const BqlHandler = {
                         // date  >=2021-11-01
                         break;
                     case "Exclude":
-                        if(queries[key]){
+                        if (queries[key]) {
                             modifier = " not";
-                        }else{
+                        } else {
                             break;
                         }
                     case "Include":
@@ -69,6 +102,7 @@ const BqlHandler = {
         var query = ""
         switch (paths[0]) {
             case "accounts":
+                console.log("here",paths)
                 if (paths.length == 2) {
                     query = "select account";
                     //get info on certain account
@@ -80,7 +114,7 @@ const BqlHandler = {
             case "positions":
                 query = "select sum(position) as total, year, month <FILTER> group by year, month"
                 break;
-        } 
+        }
         return query;
     },
     //convert the  bql to json for FE consumption
@@ -92,7 +126,7 @@ const BqlHandler = {
         lines.forEach(function (line, i) {
             if (i === 0) {
                 keys = line.split(",");
-                keys.forEach(function(value,index){
+                keys.forEach(function (value, index) {
                     //might need this later.
                 });
             } else if (line) {
@@ -107,49 +141,27 @@ const BqlHandler = {
     }
 }
 
-const FrontEndHandler = {
-    RequestData: (info) => {
-        fetch("/v1/accounts?" + new URLSearchParams(info),
-            {
-                "method": "GET"
-            }
-        ).then(function (response) {
-            if (response.ok) {
-                response.json().then(function (responseJson) {
-                    return responseJson;
-                });
-            }
-        }).catch(function (error) {
-            console.error(error);
-        });
-    }
+
+function SendRequest(req, res){
+    console.log("Request: params-", req.params, " query-", req.query)
+    var bql = BqlHandler.SpawnChildProcess(req);
+    console.log("Query: ", bql.args[2].toString())
+    var script_process = spawn(bql.cmd, bql.args);
+    var output = "";
+    script_process.stdout.setEncoding('utf8');
+
+    script_process.on('error', (err) => {
+        console.error('Failed to start subprocess.', err);
+    });
+
+    //gather stdout, since it could go a while
+    script_process.stdout.on("data", data => {
+        data = data.toString()
+        output += data;
+    });
+    //send when stdout is done
+    script_process.stdout.on("close", data => {
+        console.log("Query complete, ", output.length, " rows");
+        res.send(BqlHandler.RespToJson(output));
+    });
 }
-
-module.exports = {
-    SendRequest: function (req, res) {
-        console.log("Request: params-",req.params," query-",req.query)
-        var bql = BqlHandler.Create(req);
-        console.log("Query: ",bql.args[2].toString())
-        var script_process = spawn(bql.cmd, bql.args);
-        var output = "";
-        script_process.stdout.setEncoding('utf8');
-
-        script_process.on('error', (err) => {
-            console.error('Failed to start subprocess.', err);
-        });
-
-        //gather stdout, since it could go a while
-        script_process.stdout.on("data", data => {
-            data = data.toString()
-            output += data;
-        }); 
-        //send when stdout is done
-        script_process.stdout.on("close", data => {
-            console.log("Query complete, ", output.length, " rows");
-            res.send(BqlHandler.RespToJson(output));
-        }); 
-    },
-    FrontEndHandler
-}
-
-

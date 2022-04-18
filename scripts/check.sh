@@ -1,0 +1,1 @@
+bean-check ~/Documents/beancounter/beans/alex.beancount

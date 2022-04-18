@@ -1,0 +1,39 @@
+https://beancount.github.io/docs/beancount_query_language.html
+bean-query ../beans/alex.beancount '
+select
+  sum(cost(position)) as total, month, year
+where
+  account ~ "Expenses:Consumption.*" and not account ~".*Tax.*"  and year=2021
+group by
+  month, year
+order by
+  year, month DESC'
+
+bean-query ../beans/alex.beancount '
+select
+  account
+where
+  account ~ "Expenses:Consumption.*"
+group by
+  account'
+
+balances from date>= 2021-12-01 and date <= 2022-01-01
+where account ~ "Expenses:.*" and not account ~ ".*Tax.*"
+
+
+Assets & unrealized
+
+SELECT account, sum(position) as total
+FROM OPEN ON 2021-10-01 CLOSE ON 2022-01-10 CLEAR
+WHERE account ~ "Assets"
+GROUP BY 1
+ORDER BY account DESC;
+
+
+Income and not unrealized
+
+SELECT account, sum(position) as total
+FROM OPEN ON 2021-10-01 CLOSE ON 2022-01-10
+WHERE account ~ "Income" and not account ~".*Unrealized"
+GROUP BY 1
+ORDER BY account DESC;

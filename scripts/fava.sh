@@ -1,0 +1,1 @@
+fava ~/Documents/beancounter/beans/alex.beancount

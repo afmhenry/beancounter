@@ -1,0 +1,37 @@
+plugin "beancount.plugins.unrealized" "Unrealized"
+
+2020-01-01 open Equity:Opening-Balance DKK,USD
+2020-01-01 open Assets:DanskeBank:Checking DKK
+2020-01-01 open Assets:Schwab:Checking USD
+
+2020-01-01 open Expenses:Consumption:Grocery DKK
+2020-01-01 open Expenses:Consumption:EatingOut DKK
+2020-01-01 open Expenses:Consumption:Activities DKK
+2020-01-01 open Expenses:Consumption:Health DKK
+2020-01-01 open Expenses:Consumption:Clothes DKK
+2020-01-01 open Expenses:Consumption:Transport DKK
+2020-01-01 open Expenses:Consumption:Vacation DKK
+2020-01-01 open Expenses:Consumption:Gifts DKK
+2020-01-01 open Expenses:Consumption:Other DKK
+
+2020-01-01 open Expenses:MobilePay DKK
+
+2020-01-01 open Expenses:Housing:Rent DKK
+2020-01-01 open Expenses:Housing:Utilities DKK
+2020-01-01 open Expenses:Housing:Maintenance DKK
+2020-01-01 open Expenses:Housing:Household DKK
+
+2020-01-01 open Expenses:Subscription:Mobile DKK
+2020-01-01 open Expenses:Subscription:Insurance DKK
+2020-01-01 open Expenses:Subscription:Other DKK
+
+2020-01-01 open Expenses:Investment:ASK
+2020-01-01 open Expenses:Investment:Depot
+2020-01-01 open Expenses:Tax
+2020-01-01 open Expenses:Interest
+
+2020-01-01 open Income:Work:Salary DKK
+2020-01-01 open Income:Work:Bonus DKK
+2020-01-01 open Income:MobilePay DKK
+2020-01-01 open Income:Refund DKK
+2020-01-01 open Income:Interest DKK

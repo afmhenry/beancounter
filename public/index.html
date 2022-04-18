@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+<<<<<<< HEAD
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -13,5 +14,52 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+=======
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/assets/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <script src="https://unpkg.com/react/umd/react.production.min.js" crossorigin></script>
+
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/assets/logo192.png" />
+
+    <link rel="manifest" href="%PUBLIC_URL%/assets/manifest.json" />
+
+    <title>React App</title>
+  </head>
+  <body>
+
+    <div id="root">
+    </div>
+
+    <script type="text/javascript">
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        fetch("/accounts",
+        {
+            "method": "GET"
+        }
+      ).then(function (response) {
+          if (response.ok) {
+              response.json().then(function (responseJson) {
+                console.log(responseJson);
+                //document.getElementById("simplediv").innerHTML = JSON.stringify(responseJson);
+              }); 
+          }
+      }).catch(function (error) {
+          console.error(error);
+      });
+  
+  }, true);
+
+    
+
+
+  </script>
+>>>>>>> source/dev-vue
   </body>
 </html>

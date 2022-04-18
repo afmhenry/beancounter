@@ -210,13 +210,15 @@ def getAPI(url, params):
 
 def postAPI(url, value):
     request = requests.post(url, json={"message": value})
-    if request.status_code == 200:
+
+
+"""     if request.status_code == 200:
         response = request.json()
         return response.get("data")
     else:
         print(request.status_code)
         print(request.json())
-        return ""
+        return "" """
 
 
 def stringToDecimalFromDA(str_num):

@@ -67,7 +67,8 @@ class Importer(importer.ImporterProtocol):
                         destination_account = mapping[trans_desc]
                     else:
                         print(trans_desc)
-                        postAPI("http://localhost:5000/categorize", trans_desc)
+                        postAPI(
+                            "http://localhost:5000/categorize/this", trans_desc)
 
                         continue
 

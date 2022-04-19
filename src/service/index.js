@@ -1,6 +1,6 @@
 import express from 'express';
 import BodyParser from 'body-parser';
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 
 
 let app = express();
@@ -18,7 +18,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get('/api/*', function (req, res) {
+app.get('/*', function (req, res) {
     console.log(typeof res)
     BqlHandler.SendRequest(req, res)
 });
@@ -28,6 +28,8 @@ app.get('/api/*', function (req, res) {
 //Category API's
 app.post('/categorize/this', function (req, res) {
     console.log(req.body)
+
+    //no clue how vue can consume this data...might have to do a bulk solution.
     res.send({ "foo": "bar" })
 });
 
@@ -48,8 +50,37 @@ process.on("SIGTERM", exitfn);
 
 const BqlHandler = {
     //MORE query formats here...may need to re-org. http://aumayr.github.io/beancount-sql-queries/
+    SendRequest: (req, res) => {
+        console.log("Request: params-", req.params, " query-", req.query)
+        var bql = BqlHandler.CreateBQLQuery(req);
+        console.log("Query: ", bql.args[2].toString())
+        var script_process = spawn(bql.cmd, bql.args);
+        var output = "";
+        script_process.stdout.setEncoding('utf8');
 
-    SpawnChildProcess: (req) => {
+
+        //catch if it fails...rare, error may manifest in response instead. 
+        //so some of that is handled in the RespToJson too. 
+        script_process.on('error', (err) => {
+            console.error('Failed to start subprocess.', err);
+        });
+
+        //gather stdout, since it could go a while
+        script_process.stdout.on("data", data => {
+            data = data.toString()
+            output += data;
+        });
+
+        //send when stdout is done
+        script_process.stdout.on("close", data => {
+            console.log("Query complete, ", output.length, " rows");
+            res.send(BqlHandler.RespToJson(output));
+            return
+        });
+    },
+
+    //parse command, and execute bql query as child process 
+    CreateBQLQuery: (req) => {
         var bql = {
             "cmd": 'bean-query',
             "args": ["-f=csv", "beans/alex.beancount"]
@@ -62,6 +93,28 @@ const BqlHandler = {
 
         return bql;
     },
+
+    //convert the path parameters into the relevant section of a bql statement
+    PathToBql: (paths) => {
+        var query = ""
+        switch (paths[0]) {
+            case "accounts":
+                console.log("here", paths)
+                if (paths.length == 2) {
+                    query = "select account";
+                    //get info on certain account
+                } else {
+                    //return all accounts
+                    query = "select account <FILTER> group by account";
+                }
+                break;
+            case "positions":
+                query = "select sum(position) as total, year, month <FILTER> group by year, month"
+                break;
+        }
+        return query;
+    },
+
     //convert the query parameters into the relevant section of a bql statement
     FilterToBql: (queries, bql_base) => {
         var filter = "";
@@ -109,26 +162,7 @@ const BqlHandler = {
         var resp_bql_base = bql_base.replace("<FILTER> ", filter);
         return resp_bql_base
     },
-    //convert the path parameters into the relevant section of a bql statement
-    PathToBql: (paths) => {
-        var query = ""
-        switch (paths[0]) {
-            case "accounts":
-                console.log("here", paths)
-                if (paths.length == 2) {
-                    query = "select account";
-                    //get info on certain account
-                } else {
-                    //return all accounts
-                    query = "select account <FILTER> group by account";
-                }
-                break;
-            case "positions":
-                query = "select sum(position) as total, year, month <FILTER> group by year, month"
-                break;
-        }
-        return query;
-    },
+
     //convert the  bql to json for FE consumption
     RespToJson: (bql_string) => {
         try {
@@ -154,42 +188,27 @@ const BqlHandler = {
             console.log("Process output invalid", bql_string, error)
         }
 
-    }, SendRequest: (req, res) => {
-        console.log("Request: params-", req.params, " query-", req.query)
-        var bql = BqlHandler.SpawnChildProcess(req);
-        console.log("Query: ", bql.args[2].toString())
-        var script_process = spawn(bql.cmd, bql.args);
-        var output = "";
-        script_process.stdout.setEncoding('utf8');
-
-
-        //catch if it fails...rare, error may manifest in response instead. 
-        //so some of that is handled in the RespToJson too. 
-        script_process.on('error', (err) => {
-            console.error('Failed to start subprocess.', err);
-        });
-
-        //gather stdout, since it could go a while
-        script_process.stdout.on("data", data => {
-            data = data.toString()
-            output += data;
-        });
-
-        //send when stdout is done
-        script_process.stdout.on("close", data => {
-            console.log("Query complete, ", output.length, " rows");
-            res.send(BqlHandler.RespToJson(output));
-            return
-        });
-    }
+    },
 }
 
 const CategoryHandler = {
     SpawnChildProcess: (res) => {
         try {
             //todo: start or map? Can I make accounts on the fly?
-            var script_process = spawn("./scripts/map.sh");
-            return res.send({ "status": "started" })
+            var script_process = spawn("./scripts/map.sh")
+
+            script_process.on('error', (err) => {
+                console.error('Failed to start subprocess.', err);
+            });
+
+
+            //send when stdout is done
+            script_process.stdout.on("close", data => {
+                return res.send({ "status": script_process })
+
+            });
+            //gather stdout, since it could go a while
+
         } catch (error) {
             console.error("category", error)
             return res.send({ "status": "failed" })

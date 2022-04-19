@@ -66,16 +66,9 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        print(trans_desc)
                         postAPI(
                             "http://localhost:5000/categorize/this", trans_desc)
-
                         continue
-
-                        mappings = formatWindow(root, trans_desc, trans_amt, trans_date, mapping, account_by_type[0],
-                                                account_by_type[1])
-                        destination_account = mappings[0][mappings[1]]
-                        mapping = mappings[0]
 
                     txn = data.Transaction(
                         meta=meta,

@@ -212,15 +212,6 @@ def postAPI(url, value):
     request = requests.post(url, json={"message": value})
 
 
-"""     if request.status_code == 200:
-        response = request.json()
-        return response.get("data")
-    else:
-        print(request.status_code)
-        print(request.json())
-        return "" """
-
-
 def stringToDecimalFromDA(str_num):
     if str_num != '':
         return Decimal(str_num.replace(".", "").replace(",", "."))

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from email import message
 from beancount.ingest import importer
 from beancount.core import flags
 
@@ -35,6 +36,7 @@ class Importer(importer.ImporterProtocol):
         mapping = getCategories()
         root = setupWindow()
         trans_date = date.today()
+        missing = []
         with open(f.name, encoding="iso-8859-1") as f:
             for _ in range(1):  # first line has headers
                 next(f)
@@ -66,8 +68,7 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        postAPI(
-                            "http://localhost:5000/categorize/this", trans_desc)
+                        missing.append(trans_desc)
                         continue
 
                     txn = data.Transaction(
@@ -111,4 +112,10 @@ class Importer(importer.ImporterProtocol):
                 data.Balance(meta, trans_date + datetime.timedelta(days=1),
                              self.account,
                              amount.Amount(balance_amt_dec, 'DKK'), D(5), None))
+        # not sure how else to move structured data from py to express/js.
+        # so might have race conditions issues, see path:
+        # /beancounter/src/service/index.js, function "getAllCategories"
+        postAPI(
+            "http://localhost:5000/categorize/this", missing)
+
         return entries

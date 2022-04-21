@@ -1,26 +1,64 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-header></v-card-header>
-      <v-btn @click="StartMapping">Map</v-btn>
-      <v-btn @click="AccountHierarchy">Let's Categorize </v-btn>
-      <v-autocomplete
-        dense
-        v-if="accountMatch"
-        :items="accountMatch"
-        chips
-      ></v-autocomplete>
-    </v-card>
-
-    <v-card> </v-card>
-  </v-container>
+  <v-card height="70%">
+    <v-card-title>Get started</v-card-title>
+    <v-row>
+      <v-col> <v-btn @click="StartMapping">Map</v-btn> </v-col>
+      <v-col>
+        <v-btn @click="AccountHierarchy">Let's Categorize </v-btn>
+      </v-col>
+    </v-row>
+    <v-row class="overflow-y-auto">
+      <v-col cols="4">
+        <v-list dense>
+          <v-list-item
+            v-for="entry in categorize"
+            :key="entry.name"
+            lines="3"
+            variant="outlined"
+            class="py-0 px-3 mx-5 my-1"
+            rounded="xl"
+            active-color="primary"
+            @click="SelectCategory(entry)"
+          >
+            <v-list-item-header class="py-3 px-3">
+              <v-list-item-title
+                style="font-size: 0.8rem"
+                class="font-weight-bold"
+                >{{ entry.name }}
+              </v-list-item-title>
+              <v-list-item-subtitle style="font-size: 0.8rem">
+                on {{ entry.date }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle style="font-size: 0.7rem">
+                for {{ entry.amount }} {{ entry.currency }}
+              </v-list-item-subtitle>
+            </v-list-item-header>
+          </v-list-item>
+        </v-list>
+      </v-col>
+      <v-col>
+        <v-autocomplete
+          dense
+          v-if="itemSelected"
+          :items="accounts.account"
+          chips
+        ></v-autocomplete
+      ></v-col>
+    </v-row>
+    <v-autocomplete
+      dense
+      v-if="accountMatch"
+      :items="accountMatch"
+      chips
+    ></v-autocomplete>
+  </v-card>
 </template>
 
 <script>
 import operations from "../service/APIWrapper";
 
 export default {
-  name: "HelloWorld",
+  name: "CategorizeModule",
 
   data: () => ({
     accounts: [
@@ -316,7 +354,9 @@ export default {
         account: "Income:Investment:SaxoBank:Depot:SPIC25KL:Unrealized",
       },
     ],
+    categorize: null,
     accountMatch: null,
+    itemSelected: false,
   }),
   beforeUpdate() {
     //operations.GetAccounts();
@@ -325,7 +365,9 @@ export default {
   },
   methods: {
     StartMapping() {
-      operations.RunCategorize();
+      operations.RunCategorize().then((response) => {
+        this.categorize = response.values;
+      });
     },
     AccountHierarchy() {
       var account_set = [new Set(), new Set(), new Set()];
@@ -336,6 +378,10 @@ export default {
       }
       this.accountMatch = Array.from(account_set[0]);
       console.log(account_set);
+    },
+    SelectCategory(value) {
+      console.log(value);
+      this.itemSelected = !this.itemSelected;
     },
   },
 };

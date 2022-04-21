@@ -226,13 +226,16 @@ const CategoryHandler = {
             script_process.stdout.on("close", data => {
                 //awful potential race condition handled???? world will never know. 
                 getAllCategories(timeout).then(() => {
-                    res.send({ "status": categorize })
+                    res.send({
+                        "status": "success",
+                        "content": "categorize",
+                        "values": categorize
+                    })
                     categorize = []
                     return
                 })
 
             });
-            //gather stdout, since it could go a while
 
         } catch (error) {
             console.error("category", error)

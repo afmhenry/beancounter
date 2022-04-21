@@ -42,6 +42,7 @@ class Importer(importer.ImporterProtocol):
                 next(f)
             for index, row in enumerate(csv.reader(f, delimiter=';')):
                 # the fools at Danskbank made a breaking change on the file, so I have to offset....
+                # have the offset i in case they change it again.
                 i = 2
                 if "Udført" in row[4+i]:
                     trans_date = datetime.datetime.strptime(
@@ -68,7 +69,10 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        missing.append(trans_desc)
+                        missing.append({"name": trans_desc,
+                                        "date": trans_date.strftime("%Y-%m-%d"),
+                                        "amount": trans_amt,
+                                        "currency": "DKK"})
                         continue
 
                     txn = data.Transaction(

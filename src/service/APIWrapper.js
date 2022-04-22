@@ -9,14 +9,16 @@ const operations = {
         const response = await client
             .post(`/categorize/run`)
             .then((result) => result.data);
-        console.log(response)
         return response;
     },
-    GetAccounts: async function () {
+    GetAccounts: async function (params) {
+        var path = `/accounts`
+        if (params) {
+            path += "?" + params
+        }
         const response = await client
-            .get(`/accounts`)
+            .get(path)
             .then((result) => result.data);
-        console.log(response)
         return response;
     }
 }

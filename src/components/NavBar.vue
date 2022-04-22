@@ -1,5 +1,5 @@
 <template>
-  <v-layout>
+  <v-layout style="height: 100%">
     <ViewBar :view="view"></ViewBar>
 
     <v-navigation-drawer

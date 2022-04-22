@@ -35,11 +35,13 @@ class Importer(importer.ImporterProtocol):
         mapping = getCategories()
         root = setupWindow()
         trans_date = date.today()
+        missing = []
         with open(f.name, encoding="iso-8859-1") as f:
             for _ in range(1):  # first line has headers
                 next(f)
             for index, row in enumerate(csv.reader(f, delimiter=';')):
                 # the fools at Danskbank made a breaking change on the file, so I have to offset....
+                # have the offset i in case they change it again.
                 i = 2
                 if "Udført" in row[4+i]:
                     trans_date = datetime.datetime.strptime(
@@ -66,8 +68,10 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        postAPI(
-                            "http://localhost:5000/categorize/this", trans_desc)
+                        missing.append({"name": trans_desc,
+                                        "date": trans_date.strftime("%Y-%m-%d"),
+                                        "amount": trans_amt,
+                                        "currency": "DKK"})
                         continue
 
                     txn = data.Transaction(
@@ -111,4 +115,10 @@ class Importer(importer.ImporterProtocol):
                 data.Balance(meta, trans_date + datetime.timedelta(days=1),
                              self.account,
                              amount.Amount(balance_amt_dec, 'DKK'), D(5), None))
+        # not sure how else to move structured data from py to express/js.
+        # so might have race conditions issues, see path:
+        # /beancounter/src/service/index.js, function "getAllCategories"
+        postAPI(
+            "http://localhost:5000/categorize/this", missing)
+
         return entries

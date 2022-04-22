@@ -6,6 +6,9 @@ import { spawn, exec } from 'child_process';
 let app = express();
 let port = 5000
 
+var timeout = 10000;
+var categorize = []
+
 app.use(BodyParser.json());
 
 app.listen(port, () => {
@@ -19,18 +22,16 @@ app.use(function (req, res, next) {
 });
 
 app.get('/*', function (req, res) {
-    console.log(typeof res)
     BqlHandler.SendRequest(req, res)
 });
 
 
-
 //Category API's
 app.post('/categorize/this', function (req, res) {
-    console.log(req.body)
 
-    //no clue how vue can consume this data...might have to do a bulk solution.
-    res.send({ "foo": "bar" })
+    categorize = req.body.message
+    //no clue how vue can consume this data...might have to do a bulk solution.u
+    res.send({ "status": "recieved" })
 });
 
 app.post('/categorize/run', function (req, res) {
@@ -45,6 +46,23 @@ const exitfn = function () {
 process.on("SIGINT", exitfn);
 process.on("SIGTERM", exitfn);
 
+//dunno if this works, copied off internet. 
+//but the idea is to remove the race condition, of the script ending, 
+//and us not getting the structured data via http
+function getAllCategories(timeout) {
+
+    var start = Date.now();
+    return new Promise(waitForResponse);
+
+    function waitForResponse(resolve, reject) {
+        if (categorize.length > 0) {
+            resolve(categorize)
+        } else if (timeout && (Date.now() - start) >= timeout) {
+            reject(new Error("timeout"));
+        } else
+            setTimeout(waitForResponse.bind(this, resolve, reject), 30);
+    }
+}
 
 //todo: move this to separate file...but do it well. 
 
@@ -99,7 +117,6 @@ const BqlHandler = {
         var query = ""
         switch (paths[0]) {
             case "accounts":
-                console.log("here", paths)
                 if (paths.length == 2) {
                     query = "select account";
                     //get info on certain account
@@ -176,11 +193,16 @@ const BqlHandler = {
                         //might need this later.
                     });
                 } else if (line) {
-                    var temp = {}
-                    line.split(",").forEach(function (entry, j) {
-                        temp[keys[j]] = entry.trim()
-                    });
-                    values[i - 1] = temp;
+                    if (keys.length === 1 && keys[0] === "account") {
+                        values.push(line.trim())
+                    } else {
+                        var temp = {}
+                        line.split(",").forEach(function (entry, j) {
+                            temp[keys[j]] = entry.trim()
+                        });
+                        values[i - 1] = temp;
+                    }
+
                 }
             });
             return values;
@@ -201,13 +223,21 @@ const CategoryHandler = {
                 console.error('Failed to start subprocess.', err);
             });
 
-
             //send when stdout is done
             script_process.stdout.on("close", data => {
-                return res.send({ "status": script_process })
-
+                //awful potential race condition handled???? world will never know. 
+                getAllCategories(timeout).then(() => {
+                    res.send({
+                        "status": "success",
+                        "content": "categorize",
+                        "values": categorize
+                    })
+                    categorize = []
+                    return
+                }).catch(error => {
+                    console.error("Timeout on categorize", error)
+                })
             });
-            //gather stdout, since it could go a while
 
         } catch (error) {
             console.error("category", error)

@@ -6,7 +6,7 @@ import { spawn, exec } from 'child_process';
 let app = express();
 let port = 5000
 
-var timeout = 1000000;
+var timeout = 10000;
 var categorize = []
 
 app.use(BodyParser.json());
@@ -50,12 +50,12 @@ process.on("SIGTERM", exitfn);
 //but the idea is to remove the race condition, of the script ending, 
 //and us not getting the structured data via http
 function getAllCategories(timeout) {
-    var start = Date.now();
 
+    var start = Date.now();
     return new Promise(waitForResponse);
 
     function waitForResponse(resolve, reject) {
-        if (categorize !== []) {
+        if (categorize.length > 0) {
             resolve(categorize)
         } else if (timeout && (Date.now() - start) >= timeout) {
             reject(new Error("timeout"));
@@ -234,8 +234,9 @@ const CategoryHandler = {
                     })
                     categorize = []
                     return
+                }).catch(error => {
+                    console.error("Timeout on categorize", error)
                 })
-
             });
 
         } catch (error) {

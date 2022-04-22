@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from email import message
 from beancount.ingest import importer
 from beancount.core import flags
 

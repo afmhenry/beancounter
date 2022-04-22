@@ -22,10 +22,29 @@ app.use(function (req, res, next) {
 });
 
 app.get('/*', function (req, res) {
-    console.log(typeof res)
     BqlHandler.SendRequest(req, res)
 });
 
+
+//Category API's
+app.post('/categorize/this', function (req, res) {
+
+    categorize = req.body.message
+    //no clue how vue can consume this data...might have to do a bulk solution.u
+    res.send({ "status": "recieved" })
+});
+
+app.post('/categorize/run', function (req, res) {
+    CategoryHandler.SpawnChildProcess(res)
+});
+
+
+// Handle stop signals
+const exitfn = function () {
+    process.exit(0);
+};
+process.on("SIGINT", exitfn);
+process.on("SIGTERM", exitfn);
 
 //dunno if this works, copied off internet. 
 //but the idea is to remove the race condition, of the script ending, 
@@ -44,28 +63,6 @@ function getAllCategories(timeout) {
             setTimeout(waitForResponse.bind(this, resolve, reject), 30);
     }
 }
-
-
-//Category API's
-app.post('/categorize/this', function (req, res) {
-    console.log(req.body)
-    categorize = req.body.message
-    //no clue how vue can consume this data...might have to do a bulk solution.u
-    res.send({ "status": "recieved" })
-});
-
-app.post('/categorize/run', function (req, res) {
-    CategoryHandler.SpawnChildProcess(res)
-});
-
-
-// Handle stop signals
-const exitfn = function () {
-    process.exit(0);
-};
-process.on("SIGINT", exitfn);
-process.on("SIGTERM", exitfn);
-
 
 //todo: move this to separate file...but do it well. 
 
@@ -120,7 +117,6 @@ const BqlHandler = {
         var query = ""
         switch (paths[0]) {
             case "accounts":
-                console.log("here", paths)
                 if (paths.length == 2) {
                     query = "select account";
                     //get info on certain account
@@ -197,11 +193,16 @@ const BqlHandler = {
                         //might need this later.
                     });
                 } else if (line) {
-                    var temp = {}
-                    line.split(",").forEach(function (entry, j) {
-                        temp[keys[j]] = entry.trim()
-                    });
-                    values[i - 1] = temp;
+                    if (keys.length === 1 && keys[0] === "account") {
+                        values.push(line.trim())
+                    } else {
+                        var temp = {}
+                        line.split(",").forEach(function (entry, j) {
+                            temp[keys[j]] = entry.trim()
+                        });
+                        values[i - 1] = temp;
+                    }
+
                 }
             });
             return values;

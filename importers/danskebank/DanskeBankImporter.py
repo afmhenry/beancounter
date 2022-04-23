@@ -118,7 +118,6 @@ class Importer(importer.ImporterProtocol):
         # not sure how else to move structured data from py to express/js.
         # so might have race conditions issues, see path:
         # /beancounter/src/service/index.js, function "getAllCategories"
-        postAPI(
-            "http://localhost:5000/categorize/this", missing)
+        postAPI("http://localhost:5000/categorize/these", missing)
 
         return entries

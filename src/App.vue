@@ -1,10 +1,10 @@
 <template>
-  <v-app class="fill-height" style="height: 100vh">
-    <v-main style="height: 100vh">
+  <v-app fill-height>
+    <v-main>
       <NavBar @view="SelectView">
         <v-container style="margin: 0px 10px">
           <CategorizeModule
-            v-if="this.view === 'categorize'"
+            v-if="this.view === 'Categorize'"
           ></CategorizeModule>
         </v-container>
       </NavBar>
@@ -15,7 +15,6 @@
 <script>
 import CategorizeModule from "./components/CategorizeModule.vue";
 import NavBar from "./components/NavBar.vue";
-import ViewBar from "./components/ViewBar.vue";
 
 export default {
   name: "App",
@@ -23,11 +22,10 @@ export default {
   components: {
     CategorizeModule,
     NavBar,
-    ViewBar,
   },
 
   data: () => ({
-    view: "categorize",
+    view: "Categorize",
   }),
   methods: {
     SelectView: function (value) {

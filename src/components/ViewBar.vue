@@ -1,6 +1,9 @@
 <template>
-  <v-app-bar app clipped-left>
-    <h1>{{ view }}</h1>
+  <v-app-bar app clipped-left style="padding: 0px 0px">
+    <v-list-item prepend-icon="mdi-finance" floating
+      ><i><h1>Beancounter</h1></i></v-list-item
+    >
+    <h2 color="secondary">{{ view }}</h2>
   </v-app-bar>
 </template>
 

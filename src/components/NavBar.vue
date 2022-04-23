@@ -1,33 +1,24 @@
 <template>
-  <v-layout style="height: 100%">
+  <v-layout fill-height style="height: 100vh">
     <ViewBar :view="view"></ViewBar>
-
     <v-navigation-drawer
       v-model="drawer"
       :rail="rail"
-      @click.stop="rail = !rail"
       app
       clipped
+      width="170"
+      rail-width="72"
     >
-      <v-list-item prepend-icon="mdi-finance"><i>Beancounter</i></v-list-item>
-
-      <v-divider></v-divider>
-
       <v-list density="compact" nav>
         <v-list-item
-          prepend-icon="mdi-folder-multiple-plus-outline"
-          title="Categorize"
-          @click="UpdateView('categorize')"
-        ></v-list-item>
-        <v-list-item
-          prepend-icon="mdi-account"
-          title="Overview"
-          @click="$emit('view', 'overview')"
-        ></v-list-item>
-        <v-list-item
-          prepend-icon="mdi-account-group-outline"
-          title="Users"
-          @click="$emit('view', 'uesrs')"
+          v-for="item in items"
+          :key="item.name"
+          :prepend-icon="item.icon"
+          :title="item.title"
+          @click="UpdateView(item.title)"
+          :class="{
+            'v-list-item--active text-primary': this.view === item.title,
+          }"
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -47,29 +38,29 @@ export default {
     return {
       drawer: true,
       items: [
-        { title: "Home", icon: "mdi-home-city" },
-        { title: "My Account", icon: "mdi-account" },
+        { title: "Categorize", icon: "mdi-folder-multiple-plus-outline" },
+        { title: "Overview", icon: "mdi-account" },
         { title: "Users", icon: "mdi-account-group-outline" },
       ],
       rail: true,
       view: "home",
+      isActive: null,
     };
-  },
-  mounted: function () {
-    this.$nextTick(function () {
-      window.setInterval(() => {
-        this.HideBar();
-      }, 10000);
-    });
   },
   methods: {
     HideBar: function () {
-      //this.rail = true;
+      this.rail = true;
       console.log("foo!");
     },
     UpdateView: function (value) {
       this.$emit("view", value);
+      if (value === this.view || this.rail === true) {
+        this.rail = !this.rail;
+      }
       this.view = value;
+    },
+    toggleItem(index) {
+      this.isActive = index;
     },
   },
 };

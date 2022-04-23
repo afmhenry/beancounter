@@ -27,7 +27,7 @@ app.get('/*', function (req, res) {
 
 
 //Category API's
-app.post('/categorize/this', function (req, res) {
+app.post('/categorize/these', function (req, res) {
 
     categorize = req.body.message
     //no clue how vue can consume this data...might have to do a bulk solution.u
@@ -228,7 +228,7 @@ const CategoryHandler = {
                 //awful potential race condition handled???? world will never know. 
                 getAllCategories(timeout).then(() => {
                     res.send({
-                        "status": "success",
+                        "message": "success",
                         "content": "categorize",
                         "values": categorize
                     })
@@ -236,6 +236,9 @@ const CategoryHandler = {
                     return
                 }).catch(error => {
                     console.error("Timeout on categorize", error)
+                    res.send(500, {
+                        "message": "failed",
+                    })
                 })
             });
 

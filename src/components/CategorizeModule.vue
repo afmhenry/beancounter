@@ -207,12 +207,11 @@ export default {
   },
   methods: {
     StartMapping() {
-      operations.RunCategorize().then((response) => {
+      operations.InvokeScript("map").then((response) => {
         if (response.values.length === 0) {
           this.nothingToCategorize = true;
         }
         this.categorize = response.values;
-        console.log(response);
       });
     },
     AccountHierarchy() {
@@ -237,18 +236,15 @@ export default {
     ApplyCategoryToItem() {
       //this.categorize.find((entry) => entry.name === this.selectedItem).add("category":this.selectedCategory )
       this.categorize[this.selectedItem]["category"] = this.selectedCategory;
-
       var move_entry_to_end = this.categorize.splice(this.selectedItem, 1);
-      console.log(move_entry_to_end);
-
       this.categorized.unshift(move_entry_to_end.pop());
 
+      //reset for next-probably have more work to do.
       this.selectedCategory = null;
       this.selectedItem = null;
     },
     SubmitCategories() {
-      operations.SendUpdatedCategories(this.categorized).then((response) => {
-        console.log(response);
+      operations.SendUpdatedCategories(this.categorized).then(() => {
         window.location.reload();
       });
     },

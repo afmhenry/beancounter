@@ -5,12 +5,17 @@ const client = axios.create({
 });
 
 const operations = {
-    RunCategorize: async function () {
+
+    //invokes script file
+    InvokeScript: async function (action) {
         const response = await client
-            .post(`/categorize/run`)
+            .post(`/categorize/run/${action}`)
             .then((result) => result.data);
         return response;
-    },
+    },   
+
+    //Requests all accounts in the beancount file, 
+    //Returns them in array
     GetAccounts: async function (params) {
         var path = `/accounts`
         if (params) {
@@ -21,6 +26,8 @@ const operations = {
             .then((result) => result.data);
         return response;
     },
+
+    //updates json file containing mappings
     SendUpdatedCategories: async function (categorized) {
         const response = await client
             .post(`/categorized`, categorized)

@@ -42,8 +42,8 @@ app.post('/categorize/these', function (req, res) {
     res.send({ "status": "recieved" })
 });
 
-app.post('/categorize/run', function (req, res) {
-    CategoryHandler.SpawnChildProcess(res);
+app.post('/categorize/run/*', function (req, res) {
+    CategoryHandler.SpawnChildProcess(req.path.split("/")[3], res);
 });
 app.post('/categorized', function (req, res) {
     CategoryHandler.UpdateJSONMapping(req.body, res)
@@ -224,18 +224,20 @@ const BqlHandler = {
 }
 
 const CategoryHandler = {
-    SpawnChildProcess: (res) => {
+    SpawnChildProcess: (script, res) => {
         try {
-            //todo: start or map? Can I make accounts on the fly?
-            var script_process = spawn("./scripts/map.sh")
-
+            var script_process = spawn("./scripts/" + script + ".sh")
+            console.log(script)
             script_process.on('error', (err) => {
                 console.error('Failed to start subprocess.', err);
             });
 
             //send when stdout is done
             script_process.stdout.on("close", data => {
-                //awful potential race condition handled???? world will never know. 
+
+                //how do I want to handle output from the different scripts? 
+                //can i make this a more generic structure?
+                //probably can move this part out and do conditions on which script is invoked. 
                 getAllCategories(timeout).then(() => {
                     res.send({
                         "message": "success",
@@ -289,7 +291,6 @@ const CategoryHandler = {
                                 "message": "success",
                             })
                         }
-                        //file written successfully
                     })
                 }
 

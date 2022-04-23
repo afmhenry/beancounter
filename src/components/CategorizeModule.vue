@@ -249,7 +249,7 @@ export default {
     SubmitCategories() {
       operations.SendUpdatedCategories(this.categorized).then((response) => {
         console.log(response);
-        this.categorized = null;
+        window.location.reload();
       });
     },
   },

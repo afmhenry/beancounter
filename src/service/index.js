@@ -254,7 +254,7 @@ const CategoryHandler = {
 
         } catch (error) {
             console.error("category", error)
-            return res.send({ "status": "failed" })
+            return res.send({ "message": "failed" })
         }
     },
     UpdateJSONMapping: (contents, res) => {
@@ -283,6 +283,10 @@ const CategoryHandler = {
                             console.error("Error writing: ", file, err)
                             return res.send(500, {
                                 "message": "failed",
+                            })
+                        } else {
+                            return res.send({
+                                "message": "success",
                             })
                         }
                         //file written successfully

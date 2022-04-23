@@ -1,13 +1,22 @@
 import express from 'express';
 import BodyParser from 'body-parser';
 import { spawn, exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+
+// 👇️ "/home/john/Desktop/javascript"
+const __dirname = path.dirname(__filename);
+//make this config
+const file = __dirname + '/../../data/mapping-private.json';
 
 let app = express();
 let port = 5000
 
 var timeout = 10000;
-var categorize = []
+var categorize = null
 
 app.use(BodyParser.json());
 
@@ -29,13 +38,15 @@ app.get('/*', function (req, res) {
 //Category API's
 app.post('/categorize/these', function (req, res) {
 
-    categorize = req.body.message
-    //no clue how vue can consume this data...might have to do a bulk solution.u
+    categorize = req.body.message;
     res.send({ "status": "recieved" })
 });
 
 app.post('/categorize/run', function (req, res) {
-    CategoryHandler.SpawnChildProcess(res)
+    CategoryHandler.SpawnChildProcess(res);
+});
+app.post('/categorized', function (req, res) {
+    CategoryHandler.UpdateJSONMapping(req.body, res)
 });
 
 
@@ -46,16 +57,15 @@ const exitfn = function () {
 process.on("SIGINT", exitfn);
 process.on("SIGTERM", exitfn);
 
-//dunno if this works, copied off internet. 
-//but the idea is to remove the race condition, of the script ending, 
-//and us not getting the structured data via http
+//dfancy timeout logic, so if it stalls, we get an error. 
 function getAllCategories(timeout) {
 
     var start = Date.now();
     return new Promise(waitForResponse);
 
     function waitForResponse(resolve, reject) {
-        if (categorize.length > 0) {
+
+        if (categorize !== null) {
             resolve(categorize)
         } else if (timeout && (Date.now() - start) >= timeout) {
             reject(new Error("timeout"));
@@ -246,5 +256,40 @@ const CategoryHandler = {
             console.error("category", error)
             return res.send({ "status": "failed" })
         }
+    },
+    UpdateJSONMapping: (contents, res) => {
+
+        const content = 'Some content!'
+
+        var parsedNewCats = {}
+        for (var i in contents) {
+            parsedNewCats[contents[i].name] = contents[i].category
+        }
+        fs.readFile(file, 'utf-8', (error, content) => {
+            if (error) {
+                console.error("Error reading: ", file, error)
+                return res.send(500, {
+                    "message": "failed",
+                })
+            } else
+                if (content) {
+                    var categories = JSON.parse(content)
+                    const mergedObject = {
+                        ...categories,
+                        ...parsedNewCats
+                    };
+                    fs.writeFile(file, JSON.stringify(mergedObject, null, 2), err => {
+                        if (err) {
+                            console.error("Error writing: ", file, err)
+                            return res.send(500, {
+                                "message": "failed",
+                            })
+                        }
+                        //file written successfully
+                    })
+                }
+
+        })
+
     }
 }

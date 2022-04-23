@@ -4,7 +4,14 @@
       <h1>Categorize these transactions</h1>
       <br />
     </div>
-    <div class="text-center py-3 px-3" v-if="categorize.length === 0">
+    <div
+      class="text-center py-3 px-3"
+      v-if="
+        categorize.length === 0 &&
+        categorized.length === 0 &&
+        !nothingToCategorize
+      "
+    >
       <v-progress-circular
         style="text-align: center"
         indeterminate
@@ -13,6 +20,12 @@
         width="10"
       ></v-progress-circular>
     </div>
+    <v-row v-else-if="nothingToCategorize">
+      <div style="text-align: center">
+        <h3>Nothing left to categorize. Lets import!</h3>
+        <br />
+      </div>
+    </v-row>
     <v-row v-else>
       <v-col cols="4" max-height="100%" style="color: primary">
         <v-card>
@@ -87,8 +100,24 @@
             :readonly="true"
             label="Select Account"
             solo
-          ></v-autocomplete></v-card
-      ></v-col>
+          ></v-autocomplete
+        ></v-card>
+        <v-card>
+          <v-card-title>Update</v-card-title>
+          <v-card-subtitle
+            >Update your mapping, so these transactions can be imported.
+          </v-card-subtitle>
+          <br />
+          <div style="text-align: center" class="py-5">
+            <v-btn
+              color="secondary"
+              :disabled="categorize.length !== 0"
+              @click="SubmitCategories"
+              >Submit Updates</v-btn
+            >
+          </div>
+        </v-card></v-col
+      >
       <v-col cols="4">
         <v-card>
           <v-card-title>Newly categorized</v-card-title>
@@ -155,6 +184,7 @@ export default {
     accounts: [],
     categorize: [],
     categorized: [],
+    nothingToCategorize: false,
     selectedItem: null,
     selectedCategory: null,
     accountMatch: null,
@@ -178,7 +208,11 @@ export default {
   methods: {
     StartMapping() {
       operations.RunCategorize().then((response) => {
+        if (response.values.length === 0) {
+          this.nothingToCategorize = true;
+        }
         this.categorize = response.values;
+        console.log(response);
       });
     },
     AccountHierarchy() {
@@ -211,6 +245,12 @@ export default {
 
       this.selectedCategory = null;
       this.selectedItem = null;
+    },
+    SubmitCategories() {
+      operations.SendUpdatedCategories(this.categorized).then((response) => {
+        console.log(response);
+        this.categorized = null;
+      });
     },
   },
 };

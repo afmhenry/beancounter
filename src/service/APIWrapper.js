@@ -20,6 +20,12 @@ const operations = {
             .get(path)
             .then((result) => result.data);
         return response;
+    },
+    SendUpdatedCategories: async function (categorized) {
+        const response = await client
+            .post(`/categorized`, categorized)
+            .then((result) => result.data);
+        return response;
     }
 }
 

@@ -1,1 +1,1 @@
-bean-query -f=csv ../beans/alex.beancount "select sum(position) where account ~'.*Assets.*' and (year=2022 or year=2021)"
+bean-query -f=csv ../beans/alex.beancount "SELECT account, month, year, sum(position) as total where account ~ 'Expenses' group by month, year, account "

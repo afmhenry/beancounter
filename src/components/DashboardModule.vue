@@ -1,21 +1,14 @@
 <template>
   <v-container>
     <div style="text-align: center">
-      <h1>Categorize these transactions</h1>
+      <h1>Dashboards</h1>
       <br />
     </div>
-    <div
-      class="text-center py-3 px-3"
-      v-if="
-        categorize.length === 0 &&
-        categorized.length === 0 &&
-        !nothingToCategorize
-      "
-    >
+    <div class="text-center py-3 px-3" v-if="loading">
       <v-progress-circular
         style="text-align: center"
         indeterminate
-        color="primary"
+        color="error"
         size="100"
         width="10"
       ></v-progress-circular>
@@ -27,60 +20,6 @@
       </div>
     </v-row>
     <v-row v-else>
-      <v-col cols="4" max-height="100%" style="color: primary">
-        <v-card>
-          <v-card-title>Select</v-card-title>
-          <v-card-subtitle>
-            These purchases aren't mapped to a category.
-          </v-card-subtitle>
-
-          <br />
-          <v-list dense allow-overflow>
-            <v-list-item
-              v-for="(entry, index) in categorize"
-              :key="entry.name"
-              lines="3"
-              variant="outlined"
-              class="py-0 px-3 mx-5 my-1"
-              rounded="xl"
-              :class="{
-                'v-list-item--active text-primary': index === selectedItem,
-              }"
-              @click="SelectCategory(index)"
-            >
-              <v-row>
-                <v-col cols="6"
-                  ><v-list-item-header class="py-3 px-3">
-                    <v-list-item-title
-                      style="font-size: 0.8rem"
-                      class="font-weight-bold"
-                      >{{ entry.name }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle style="font-size: 0.8rem">
-                      on {{ entry.date }}
-                    </v-list-item-subtitle>
-                    <v-list-item-subtitle style="font-size: 0.7rem">
-                      for {{ entry.amount }} {{ entry.currency }}
-                    </v-list-item-subtitle>
-                  </v-list-item-header></v-col
-                >
-                <v-col cols="6"
-                  ><v-list-item-header
-                    class="py-3 px-3"
-                    style="overflow-wrap: break-word"
-                  >
-                    <v-list-item-title
-                      style="font-size: 0.8rem"
-                      class="font-weight-bold"
-                      >{{ entry.category || "" }}
-                    </v-list-item-title>
-                  </v-list-item-header>
-                </v-col>
-              </v-row>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
       <v-col cols="4">
         <v-card>
           <v-card-title>Assign</v-card-title>
@@ -179,6 +118,7 @@ export default {
   name: "CategorizeModule",
 
   data: () => ({
+    loading: true,
     accounts: [],
     categorize: [],
     categorized: [],

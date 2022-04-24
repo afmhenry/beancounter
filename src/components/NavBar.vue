@@ -38,6 +38,7 @@ export default {
     return {
       drawer: true,
       items: [
+        { title: "Import", icon: "mdi-database-import" },
         { title: "Categorize", icon: "mdi-folder-multiple-plus-outline" },
         { title: "Overview", icon: "mdi-account" },
         { title: "Users", icon: "mdi-account-group-outline" },
@@ -65,6 +66,7 @@ export default {
   },
 };
 
+//mdi-database-import
 //mdi-bank-transfer-in for imports
 //mdi-chart-pie
 //mdi-chart-timeline-variant-shimmer

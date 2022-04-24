@@ -4,6 +4,7 @@ import { spawn, exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import FileReader from "filereader";
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -47,6 +48,16 @@ app.post('/categorize/run/*', function (req, res) {
 });
 app.post('/categorized', function (req, res) {
     CategoryHandler.UpdateJSONMapping(req.body, res)
+});
+
+
+//not easy to get the file...will have to eval if express/js is right tool for that. 
+//maybe will be the pushing point for moving to flask. 
+//could also invoke a cli copy, but that ofc could only work on non-windows. 
+app.post('/statements', function (req, res) {
+    console.log(req)
+
+    res.send({ "status": "recieved" })
 });
 
 

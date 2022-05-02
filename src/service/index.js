@@ -31,7 +31,14 @@ app.use(function (req, res, next) {
     next();
 });
 
+//get monthly breakdown of certain accounts
 app.get('/hist', function (req, res) {
+    BqlHandler.SendRequest(req, res)
+});
+
+
+//provide list of accounts, matching the params
+app.get('/accounts', function (req, res) {
     BqlHandler.SendRequest(req, res)
 });
 

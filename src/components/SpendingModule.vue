@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <h1>Hi</h1>
     <div
       class="fill-height"
       style="width: 100%; height: 100%"
@@ -24,24 +23,15 @@ export default {
     chartOptions: {
       title: null,
       legend: {
-        enabled: false,
+        enabled: true,
       },
-      yAxis: {
-        title: null,
-        labels: {
-          format: "{date}",
-          style: {
-            color: "#FFFFFF",
-            fontSize: "12px",
-          },
-        },
-      },
+
       series: [],
       credits: {
         enabled: false,
       },
       chart: {
-        type: "bar",
+        type: "column",
         backgroundColor: "#18263bb7",
         height: "40%",
         style: {
@@ -51,6 +41,23 @@ export default {
       plotOptions: {
         series: {
           stacking: "normal",
+          events: {
+            legendItemClick: function (event) {
+              if (!this.visible) {
+                this.visible = !this.visible;
+              }
+
+              var seriesIndex = this.index;
+              var series = this.chart.series;
+
+              for (var i = 0; i < series.length; i++) {
+                if (series[i].index != seriesIndex) {
+                  series[i].visible = series[i].hide();
+                }
+              }
+              return false;
+            },
+          },
         },
         /* area: {
           stacking: "percent",
@@ -77,12 +84,7 @@ export default {
       var date_range = new Array();
       var accounts = new Array();
       operations
-        .GetSpending([
-          "Include=Expenses",
-          "Exclude=Tax,Housing",
-          "Year=2022",
-          "Month=1,2,3,4",
-        ])
+        .GetSpending(["Include=Expenses", "Exclude=Tax", "Year=2021,2022"])
         .then((response) => {
           for (var i in response) {
             var date = new Date(response[i].year, response[i].month, 0);
@@ -115,6 +117,7 @@ export default {
         amounts = [];
         element.forEach((subElem) => {
           amounts.push([subElem.date, parseInt(subElem.total.split(" ")[0])]);
+          //amounts.push({"date": subElem.date, "value": parseInt(subElem.total.split(" ")[0])});
         });
         accounts.push(amounts);
         this.chartOptions.series.push({
@@ -127,17 +130,28 @@ export default {
       });
 
       this.chartOptions["xAxis"] = {
+        title: "Date",
+        categories: this.dateRange,
         labels: {
-          format: "{date}",
+          format: "{value}",
           style: {
             color: "#FFFFFF",
             fontSize: "12px",
           },
         },
       };
-
+      this.chartOptions["yAxis"] = {
+        title: "Amount",
+        labels: {
+          format: "{text} kr",
+          style: {
+            color: "#FFFFFF",
+            fontSize: "12px",
+          },
+        },
+      };
       this.chartOptions["tooltip"] = {
-        headerFormat: "<b>{point.x}</b><br/>",
+        headerFormat: "<b>{point.key}</b><br/>",
         pointFormat: "{series.name}: {point.y}<br/>Total: {point.stackTotal}",
       };
       this.chartOptions.title = "Spending";

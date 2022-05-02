@@ -19,12 +19,17 @@ const operations = {
     //Requests all accounts in the beancount file, 
     //Returns them in array
     GetAccounts: async function (params) {
-        var path = `/accounts`
-        if (params) {
-            path += "?" + params
-        }
+
         const response = await client
-            .get(path)
+            .get(`/accounts${HandleParams(params)}`)
+            .then((result) => result.data);
+        return response;
+    },
+
+
+    GetSpending: async function (params) {
+        const response = await client
+            .get(`/hist${HandleParams(params)}`)
             .then((result) => result.data);
         return response;
     },
@@ -48,6 +53,17 @@ const operations = {
         return response
     }
 
+}
+
+function HandleParams(params) {
+    var parsed_params = ""
+    if (params) {
+        parsed_params = "?"
+        for (var i in params) {
+            parsed_params += params[i] + "&"
+        }
+    }
+    return parsed_params
 }
 
 export default operations

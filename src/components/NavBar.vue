@@ -40,7 +40,7 @@ export default {
       items: [
         { title: "Import", icon: "mdi-database-import" },
         { title: "Categorize", icon: "mdi-folder-multiple-plus-outline" },
-        { title: "Overview", icon: "mdi-account" },
+        { title: "Dashboard", icon: "mdi-account" },
         { title: "Users", icon: "mdi-account-group-outline" },
       ],
       rail: true,

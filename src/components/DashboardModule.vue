@@ -1,10 +1,25 @@
 <template>
-  <v-container>
+  <v-container fill-height>
     <div style="text-align: center">
       <h1>Dashboards</h1>
-      <br />
     </div>
-    <div class="text-center py-3 px-3" v-if="loading">
+    <v-card>
+      <v-toolbar color="info-light">
+        <v-tabs v-model="tab">
+          <v-tab v-for="item in items" :key="item" :value="item">
+            {{ item.name }}
+          </v-tab>
+        </v-tabs>
+        <v-spacer></v-spacer>
+      </v-toolbar>
+      <v-window v-model="tab" fill-height>
+        <v-window-item v-for="item in items" :key="item" :value="item">
+          <component :is="item.component"></component>
+        </v-window-item>
+      </v-window>
+    </v-card>
+
+    <!--     <div class="text-center py-3 px-3" v-if="loading">
       <v-progress-circular
         style="text-align: center"
         indeterminate
@@ -12,178 +27,68 @@
         size="100"
         width="10"
       ></v-progress-circular>
-    </div>
-    <v-row v-else-if="nothingToCategorize">
-      <div style="text-align: center">
-        <h3>Nothing left to categorize. Lets import!</h3>
-        <br />
-      </div>
-    </v-row>
-    <v-row v-else>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title>Assign</v-card-title>
-          <v-card-subtitle
-            >Assign the transaction to an account, so it is properly
-            categorized.
-          </v-card-subtitle>
-          <br />
-          <v-autocomplete
-            dense
-            :items="accounts"
-            v-model="selectedCategory"
-            chips
-            outlined
-            bg-color="info-light"
-            class="px-5"
-            :disabled="!anyItemSelected"
-            :readonly="true"
-            label="Select Account"
-            solo
-          ></v-autocomplete
-        ></v-card>
-        <v-card>
-          <v-card-title>Update</v-card-title>
-          <v-card-subtitle
-            >Update your mapping, so these transactions can be imported.
-          </v-card-subtitle>
-          <br />
-          <div style="text-align: center" class="py-5">
-            <v-btn
-              color="secondary"
-              :disabled="categorize.length !== 0"
-              @click="SubmitCategories"
-              >Submit Updates</v-btn
-            >
-          </div>
-        </v-card></v-col
-      >
-      <v-col cols="4">
-        <v-card>
-          <v-card-title>Newly categorized</v-card-title>
-          <v-card-subtitle>
-            These purchases are categorized, but make sure to submit before
-            leaving the page.
-          </v-card-subtitle>
-          <v-list dense>
-            <v-list-item
-              v-for="entry in categorized"
-              :key="entry.name"
-              lines="3"
-              variant="outlined"
-              class="py-0 px-3 mx-5 my-1"
-              rounded="xl"
-            >
-              <v-row>
-                <v-col cols="6"
-                  ><v-list-item-header class="py-3 px-3">
-                    <v-list-item-title
-                      style="font-size: 0.8rem"
-                      class="font-weight-bold"
-                      >{{ entry.name }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle style="font-size: 0.8rem">
-                      on {{ entry.date }}
-                    </v-list-item-subtitle>
-                    <v-list-item-subtitle style="font-size: 0.7rem">
-                      for {{ entry.amount }} {{ entry.currency }}
-                    </v-list-item-subtitle>
-                  </v-list-item-header></v-col
-                >
-                <v-col cols="6"
-                  ><v-list-item-header
-                    class="py-3 px-3"
-                    style="overflow-wrap: break-word"
-                  >
-                    <v-list-item-title
-                      style="font-size: 0.8rem"
-                      class="font-weight-bold"
-                      >{{ entry.category || "" }}
-                    </v-list-item-title>
-                  </v-list-item-header>
-                </v-col>
-              </v-row>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
-    </v-row>
+    </div> -->
   </v-container>
 </template>
 
 <script>
 import operations from "../service/APIWrapper";
+import SpendingModule from "./SpendingModule.vue";
 
 export default {
-  name: "CategorizeModule",
+  name: "DashboardModule",
 
   data: () => ({
-    loading: true,
-    accounts: [],
-    categorize: [],
-    categorized: [],
-    nothingToCategorize: false,
-    selectedItem: null,
-    selectedCategory: null,
-    accountMatch: null,
-    anyItemSelected: false,
+    tab: null,
+    items: [
+      {
+        name: "Spending",
+        component: <SpendingModule></SpendingModule>,
+      },
+      {
+        name: "Net Worth",
+        component: <SpendingModule></SpendingModule>,
+      },
+    ],
+    chartOptions: {
+      title: null,
+      legend: {
+        enabled: false,
+      },
+      yAxis: {
+        title: null,
+        labels: {
+          style: {
+            color: "#FFFFFF",
+            fontSize: "12px",
+          },
+        },
+      },
+      series: [
+        {
+          name: "Price",
+          data: [],
+          color: "#6661D4",
+        },
+      ],
+      credits: {
+        enabled: false,
+      },
+      chart: {
+        backgroundColor: "#18263bb7",
+        height: "30%",
+        style: {
+          fontFamily: "courier",
+        },
+      },
+    },
   }),
-  beforeUpdate() {
-    //operations.GetAccounts();
-    this.AccountHierarchy();
-    console.log("#{test}");
-  },
-  created() {
-    this.GetAccounts("Exclude=Unrealized,Equity,Assets,Pnl,Tax");
-    this.StartMapping();
-  },
-  watch: {
-    selectedCategory() {
-      if (this.selectedCategory) this.ApplyCategoryToItem();
-      else this.anyItemSelected = null;
-    },
-  },
+  created() {},
+  watch: {},
   methods: {
-    StartMapping() {
-      operations.InvokeScript("map").then((response) => {
-        if (response.values.length === 0) {
-          this.nothingToCategorize = true;
-        }
-        this.categorize = response.values;
-      });
-    },
-    AccountHierarchy() {
-      var account_set = [new Set(), new Set(), new Set()];
-      for (var i in this.accounts) {
-        account_set[0].add(this.accounts[i].account.split(":")[0]);
-        account_set[1].add(this.accounts[i].account.split(":")[1]);
-        account_set[2].add(this.accounts[i].account.split(":")[2]);
-      }
-      this.accountMatch = Array.from(account_set[0]);
-      console.log(account_set);
-    },
-    SelectCategory(index) {
-      this.selectedItem = index;
-      this.anyItemSelected = true;
-    },
     GetAccounts(filters) {
       operations.GetAccounts(filters).then((response) => {
         this.accounts = response;
-      });
-    },
-    ApplyCategoryToItem() {
-      //this.categorize.find((entry) => entry.name === this.selectedItem).add("category":this.selectedCategory )
-      this.categorize[this.selectedItem]["category"] = this.selectedCategory;
-      var move_entry_to_end = this.categorize.splice(this.selectedItem, 1);
-      this.categorized.unshift(move_entry_to_end.pop());
-
-      //reset for next-probably have more work to do.
-      this.selectedCategory = null;
-      this.selectedItem = null;
-    },
-    SubmitCategories() {
-      operations.SendUpdatedCategories(this.categorized).then(() => {
-        window.location.reload();
       });
     },
   },

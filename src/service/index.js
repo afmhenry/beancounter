@@ -31,7 +31,14 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get('/*', function (req, res) {
+//get monthly breakdown of certain accounts
+app.get('/hist', function (req, res) {
+    BqlHandler.SendRequest(req, res)
+});
+
+
+//provide list of accounts, matching the params
+app.get('/accounts', function (req, res) {
     BqlHandler.SendRequest(req, res)
 });
 
@@ -125,7 +132,8 @@ const BqlHandler = {
             "args": ["-f=csv", "beans/alex.beancount"]
         }
         //apply operations from path
-        var bql_base = BqlHandler.PathToBql(req.params);
+        var bql_base = BqlHandler.PathToBql(req.path);
+
         //apply operations from query params, as filters
         var bql_with_filter = BqlHandler.FilterToBql(req.query, bql_base);
         bql["args"].push(bql_with_filter)
@@ -136,7 +144,7 @@ const BqlHandler = {
     //convert the path parameters into the relevant section of a bql statement
     PathToBql: (paths) => {
         var query = ""
-        switch (paths[0]) {
+        switch (paths.split("/")[1]) {
             case "accounts":
                 if (paths.length == 2) {
                     query = "select account";
@@ -146,8 +154,9 @@ const BqlHandler = {
                     query = "select account <FILTER> group by account";
                 }
                 break;
-            case "positions":
-                query = "select sum(position) as total, year, month <FILTER> group by year, month"
+            case "hist":
+                //query = "select sum(position) as total, year, month <FILTER> group by year, month"
+                query = "SELECT year, month, account, sum(position) as total <FILTER> group by month, year, account "
                 break;
         }
         return query;
@@ -219,11 +228,11 @@ const BqlHandler = {
                     } else {
                         var temp = {}
                         line.split(",").forEach(function (entry, j) {
+
                             temp[keys[j]] = entry.trim()
                         });
                         values[i - 1] = temp;
                     }
-
                 }
             });
             return values;

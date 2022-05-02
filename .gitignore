@@ -35,5 +35,6 @@ documents/*
 *.pdf
 *.PDF
 *.json
+*.txt
 node_modules
 !package.json

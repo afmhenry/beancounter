@@ -194,7 +194,7 @@ export default {
     console.log("#{test}");
   },
   created() {
-    this.GetAccounts("Exclude=Unrealized,Equity,Assets,Pnl,Tax");
+    this.GetAccounts(["Exclude=Unrealized,Equity,Assets,Pnl,Tax"]);
     this.StartMapping();
   },
   watch: {

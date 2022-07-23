@@ -36,7 +36,8 @@ class Importer(importer.ImporterProtocol):
 
     def file_date(self, file):
         date_str = re.findall("[0-9]{2}.[0-9]{2}.[0-9]{4}", file.name)[0]
-        file_date = datetime.datetime.strptime(date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
+        file_date = datetime.datetime.strptime(
+            date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
         file_date = parse(file_date).date()
         return file_date
 
@@ -46,8 +47,10 @@ class Importer(importer.ImporterProtocol):
         # extremely hacky parsing--regex may need adjustment if there are new lines, or some values get bigger
         # for example if a number goes from hundreds to thousands, thousands to tens of thousands.
         raw = parser.from_file(f.name)
-        description = str.split(raw["content"], "Lønseddel for perioden")[1].split("\n")[0]
-        all_info = str.split(raw['content'], "Sats       Beløb")[1].split("AM-grundlag")[0]
+        description = str.split(raw["content"], "Lønseddel for perioden")[
+            1].split("\n")[0]
+        all_info = str.split(raw['content'], "Sats       Beløb")[
+            1].split("AM-grundlag")[0]
         lines = str.splitlines(all_info)
         line_code_pattern = "([0-9]{4,5})|(Overført via NemKonto){1}"
 
@@ -55,12 +58,16 @@ class Importer(importer.ImporterProtocol):
         code_mapping = {
             "1000": (self.income_account, {
                 ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0)}),
+            "4621": (self.income_account.replace("GrossSalary", "VacationPay"), {
+                ("[0-9]*\.*[0-9]{3},[0-9]{2}", 0)}),
+            "4623": (self.income_account.replace("GrossSalary", "VacationBonusPay"), {
+                ("[0-9]+\.[0-9]{3},[0-9]{2}", 0)}),
             "6020": (self.pension_account + "Firmabidrag", [
                 ("[0-9]\.[0-9]{3},[0-9]{2}", 0),
                 ("[0-9]{2},[0-9]{2}", 2)]),
             "6021": (self.pension_account + "Egenbidrag", [
                 ("[0-9]\.[0-9]{3},[0-9]{2}-", 0),
-                ("[0-9]{2},[0-9]{2}", 1)]),
+                ("[0-9]{1},[0-9]{2}", 1)]),
             "8100": (self.tax_account + "ATP", {
                 ("[0-9]{2},[0-9]{2}-", 0)}),
             "8220": (self.tax_account + "AM-bidrag", [
@@ -83,7 +90,8 @@ class Importer(importer.ImporterProtocol):
         pre_txn = []
         trans_date = None
         for line in lines:
-            result = consumeConfigProvidePostings(pre_txn, line_code_pattern, line, code_mapping)
+            result = consumeConfigProvidePostings(
+                pre_txn, line_code_pattern, line, code_mapping)
             if result:
                 trans_date = result
         txn = data.Transaction(

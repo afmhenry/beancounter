@@ -7,16 +7,14 @@ import { fileURLToPath } from 'url';
 import FileReader from "filereader";
 
 const __filename = fileURLToPath(import.meta.url);
-
-// 👇️ "/home/john/Desktop/javascript"
 const __dirname = path.dirname(__filename);
-//make this config
+//todo: make this path a UI config
 const file = __dirname + '/../../data/mapping-private.json';
 
 let app = express();
 let port = 5000
 
-var timeout = 10000;
+var timeout = 100000;
 var categorize = null
 
 app.use(BodyParser.json());

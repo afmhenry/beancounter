@@ -49,7 +49,7 @@
               @click="SelectCategory(index)"
             >
               <v-row>
-                <v-col cols="6"
+                <v-col cols="11"
                   ><v-list-item-header class="py-3 px-3">
                     <v-list-item-title
                       style="font-size: 0.8rem"
@@ -64,7 +64,7 @@
                     </v-list-item-subtitle>
                   </v-list-item-header></v-col
                 >
-                <v-col cols="6"
+                <v-col cols="1"
                   ><v-list-item-header
                     class="py-3 px-3"
                     style="overflow-wrap: break-word"

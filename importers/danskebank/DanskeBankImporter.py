@@ -36,6 +36,7 @@ class Importer(importer.ImporterProtocol):
         root = setupWindow()
         trans_date = date.today()
         missing = []
+        missingName = []
         with open(f.name, encoding="iso-8859-1") as f:
             for _ in range(1):  # first line has headers
                 next(f)
@@ -68,10 +69,12 @@ class Importer(importer.ImporterProtocol):
                     if trans_desc in mapping:
                         destination_account = mapping[trans_desc]
                     else:
-                        missing.append({"name": trans_desc,
-                                        "date": trans_date.strftime("%Y-%m-%d"),
-                                        "amount": trans_amt,
-                                        "currency": "DKK"})
+                        if trans_desc not in missingName:
+                            missing.append({"name": trans_desc,
+                                            "date": trans_date.strftime("%Y-%m-%d"),
+                                            "amount": trans_amt,
+                                            "currency": "DKK"})
+                            missingName.append(trans_desc)
                         continue
 
                     txn = data.Transaction(

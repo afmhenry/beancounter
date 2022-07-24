@@ -17,7 +17,7 @@ googleapis-common-protos==1.54.0
 httplib2==0.20.2
 idna==3.3
 iniconfig==1.1.1
-lxml==4.7.1
+lxml==4.9.1
 openpyxl==3.0.9
 packaging==21.3
 pluggy==1.0.0

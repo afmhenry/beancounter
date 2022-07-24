@@ -30,7 +30,7 @@ export default {
       this.files = this.$refs.file.files;
 
       operations.UploadStatementFile(this.files).then((response) => {
-        console.log(response); 
+        console.log(response);
       });
     },
   },

@@ -1,7 +1,7 @@
 attrs==21.4.0
 beancount==2.3.4
 beautifulsoup4==4.10.0
-bottle==0.12.19
+bottle==0.12.20
 cachetools==4.2.4
 certifi==2021.10.8
 chardet==4.0.0

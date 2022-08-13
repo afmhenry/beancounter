@@ -28,6 +28,7 @@ def danishToStdDec(value):
         .replace(".", "")
         .replace(",", ".")
     )
+    # this doesnt fucking work
 
 
 def consumeConfigProvidePostings(pre_txn, line_code_pattern, line, code_mapping):

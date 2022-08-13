@@ -58,6 +58,8 @@ class Importer(importer.ImporterProtocol):
         code_mapping = {
             "1000": (self.income_account, {
                 ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0)}),
+            "4254": (self.income_account, {
+                    ("[0-9\.]+,[0-9]{2}\-", 0)}),
             "4621": (self.income_account.replace("GrossSalary", "VacationPay"), {
                 ("[0-9]*\.*[0-9]{3},[0-9]{2}", 0)}),
             "4623": (self.income_account.replace("GrossSalary", "VacationBonusPay"), {

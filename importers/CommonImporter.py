@@ -20,7 +20,10 @@ import tkinter as tk
 
 
 def danishToStdDec(value):
-    return Decimal(
+    multiplier = 1
+    if "-" in value and "." in value:
+        multiplier = -1
+    return multiplier * Decimal(
         value.replace("-", "")
         .replace(".", "")
         .replace(",", ".")
@@ -68,8 +71,6 @@ def consumeConfigProvidePostings(pre_txn, line_code_pattern, line, code_mapping)
 
 
 def appendPayslipPosting(pre_txn, account, value, metadata):
-    if "Income" in account:
-        value *= -1
     pre_txn.append(
         data.Posting(
             account,

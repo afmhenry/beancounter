@@ -10,6 +10,8 @@
 </template>
 
 <script>
+/* eslint-disable */
+
 import Highcharts from "highcharts";
 import operations from "../service/APIWrapper";
 

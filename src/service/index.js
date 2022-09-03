@@ -1,3 +1,4 @@
+/* eslint-disable */
 import express from 'express';
 import BodyParser from 'body-parser';
 import { spawn, exec } from 'child_process';

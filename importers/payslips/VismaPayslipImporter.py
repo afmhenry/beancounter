@@ -1,7 +1,7 @@
 from beancount.ingest import importer
 from beancount.core import flags
 from ..CommonImporter import *
-
+from enum import Enum
 from datetime import date
 from dateutil.parser import parse
 import datetime
@@ -47,44 +47,75 @@ class Importer(importer.ImporterProtocol):
         # extremely hacky parsing--regex may need adjustment if there are new lines, or some values get bigger
         # for example if a number goes from hundreds to thousands, thousands to tens of thousands.
         raw = parser.from_file(f.name)
+        print(f.name)
         description = str.split(raw["content"], "Lønseddel for perioden")[
             1].split("\n")[0]
         all_info = str.split(raw['content'], "Sats       Beløb")[
             1].split("AM-grundlag")[0]
         lines = str.splitlines(all_info)
         line_code_pattern = "([0-9]{4,5})|(Overført via NemKonto){1}"
-
         ##key, account, regexX, positionX
         code_mapping = {
-            "1000": (self.income_account, {
-                ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0)}),
-            "4621": (self.income_account.replace("GrossSalary", "VacationPay"), {
-                ("[0-9]*\.*[0-9]{3},[0-9]{2}", 0)}),
-            "4623": (self.income_account.replace("GrossSalary", "VacationBonusPay"), {
-                ("[0-9]+\.[0-9]{3},[0-9]{2}", 0)}),
-            "6020": (self.pension_account + "Firmabidrag", [
-                ("[0-9]\.[0-9]{3},[0-9]{2}", 0),
-                ("[0-9]{2},[0-9]{2}", 2)]),
-            "6021": (self.pension_account + "Egenbidrag", [
-                ("[0-9]\.[0-9]{3},[0-9]{2}-", 0),
-                ("[0-9]{1},[0-9]{2}", 1)]),
-            "8100": (self.tax_account + "ATP", {
-                ("[0-9]{2},[0-9]{2}-", 0)}),
-            "8220": (self.tax_account + "AM-bidrag", [
-                ("[0-9]\.[0-9]{3},[0-9]{2}-", 0),
-                ("[0-9],[0-9]{2}", 1),
-                ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0)]),
-            "8250": (self.tax_account + "A-skat", [
+            # Månedsløn
+            "1000": ([self.income_account], {
+                ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0)},
+                Mode.NONE,
+                -1),
+            # Fri egen regning, timer
+            "4254": ([self.income_account], [
+                ("[0-9\.]+,[0-9]{2}\-", 0),
+                ("[0-9]*,[0-9]{2}", 0),
+                ("[0-9]*,[0-9]{2}", 1)],
+                Mode.HOURLY,
+                1),
+            "4621": ([self.income_account.replace("GrossSalary", "VacationPay")], {
+                ("[0-9]*\.*[0-9]{3},[0-9]{2}", 0)},
+                Mode.NONE,
+                -1),
+            "4623": ([self.income_account.replace("GrossSalary", "VacationBonusPay")], {
+                ("[0-9]+\.[0-9]{3},[0-9]{2}", 0)},
+                Mode.NONE,
+                -1),
+            "6020": (["Income:Pension:" + "Firmabidrag", self.pension_account + "Firmabidrag"], [
+                ("[0-9]*\.[0-9]{3},[0-9]{2}", 0),
+                ("[0-9]*\.[0-9]{3},[0-9]{2}", 1),
+                ("[0-9]{2},[0-9]{2}", 2)],
+                Mode.PERCENTAGE,
+                -1),
+            "6021": ([self.pension_account + "Egenbidrag"], [
+                ("[0-9]*\.[0-9]{3},[0-9]{2}-", 0),
+                ("[0-9]*\.[0-9]{3},[0-9]", 0),
+                ("[0-9]{1},[0-9]{2}", 1)],
+                Mode.PERCENTAGE,
+                1),
+            "8100": ([self.tax_account + "ATP"], {
+                ("[0-9]{2},[0-9]{2}-", 0)},
+                Mode.NONE,
+                1),
+            "8220": ([self.tax_account + "AM-bidrag"], [
+                ("[0-9]*\.[0-9]{3},[0-9]{2}-", 0),
+                ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0),
+                ("[0-9],[0-9]{2}", 1)],
+                Mode.PERCENTAGE,
+                1),
+            # A-skat af løn
+            "8250": ([self.tax_account + "A-skat"], [
                 ("[0-9]{2}\.[0-9]{3},[0-9]{2}-", 0),
                 ("[0-9]{2},[0-9]{2}", 2),
                 ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0),
-                ("[0-9]\.[0-9]{3},[0-9]{2}", 1)]),
-            "9501": (self.other_account, {
-                ("[0-9]{3},[0-9]{2}-", 0)}),
-            "Overført via NemKonto": (self.destination_account, [
+                ("[0-9]\.[0-9]{3},[0-9]{2}", 1)],
+                Mode.DEDUCTION,
+                1),
+            # Frokostordning
+            "9501": ([self.other_account], {
+                ("[0-9]{3},[0-9]{2}-", 0)},
+                Mode.NONE,
+                1),
+            "Overført via NemKonto": ([self.destination_account], [
                 ("[0-9]{2}\.[0-9]{3},[0-9]{2}", 0),
-                ("[0-9]{2}-[0-9]{2}-[0-9]{4}", 0)
-            ])
+                ("[0-9]{2}-[0-9]{2}-[0-9]{4}", 0)],
+                Mode.DATE,
+                1)
         }
         meta = data.new_metadata(f.name, 0)
         pre_txn = []

@@ -47,6 +47,7 @@ class Importer(importer.ImporterProtocol):
         # extremely hacky parsing--regex may need adjustment if there are new lines, or some values get bigger
         # for example if a number goes from hundreds to thousands, thousands to tens of thousands.
         raw = parser.from_file(f.name)
+        print(f.name)
         description = str.split(raw["content"], "Lønseddel for perioden")[
             1].split("\n")[0]
         all_info = str.split(raw['content'], "Sats       Beløb")[

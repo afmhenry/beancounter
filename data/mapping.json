@@ -1,1 +1,7 @@
-{"description from bank--link to this type of expense.":"Expenses:Consumption:Outings","CATME4.DK":"Expenses:Subscription:Mobile","CATME3.DK":"Expenses:Subscription:Mobile","CATME2.DK":"Expenses:Consumption:Grocery","CATME1.DK":"Expenses:Consumption:Grocery"}
+{
+  "description from bank--link to this type of expense.": "Expenses:Consumption:Outings",
+  "CATME4.DK": "Expenses:Subscription:Mobile",
+  "CATME3.DK": "Expenses:Subscription:Mobile",
+  "CATME2.DK": "Expenses:Consumption:Grocery",
+  "CATME1.DK": "Expenses:Consumption:Grocery"
+}

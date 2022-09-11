@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container width="100%">
     <div style="text-align: center">
       <h1>Categorize these transactions</h1>
       <br />
@@ -26,7 +26,7 @@
         <br />
       </div>
     </v-row>
-    <v-row v-else>
+    <v-row v-else class="overflow-auto">
       <v-col cols="4" max-height="100%" style="color: primary">
         <v-card>
           <v-card-title>Select</v-card-title>
@@ -35,7 +35,7 @@
           </v-card-subtitle>
 
           <br />
-          <v-list dense allow-overflow>
+          <v-list dense class="overflow-y-auto" style="max-height: 75vh">
             <v-list-item
               v-for="(entry, index) in categorize"
               :key="entry.name"
@@ -44,9 +44,10 @@
               class="py-0 px-3 mx-5 my-1"
               rounded="xl"
               :class="{
-                'v-list-item--active text-primary': index === selectedItem,
+                'v-list-item--active text-primary':
+                  index === selectedItem && selectedList === 'categorize',
               }"
-              @click="SelectCategory(index)"
+              @click="SelectCategory(index, 'categorize')"
             >
               <v-row>
                 <v-col cols="11"
@@ -98,7 +99,6 @@
             bg-color="info-light"
             class="px-5"
             :disabled="!anyItemSelected"
-            :readonly="true"
             label="Select Account"
             solo
           ></v-autocomplete
@@ -112,7 +112,7 @@
           <div style="text-align: center" class="py-5">
             <v-btn
               color="secondary"
-              :disabled="categorize.length !== 0"
+              :disabled="categorized.length === 0"
               @click="SubmitCategories"
               >Submit Updates</v-btn
             >
@@ -128,12 +128,17 @@
           </v-card-subtitle>
           <v-list dense>
             <v-list-item
-              v-for="entry in categorized"
+              v-for="(entry, index) in categorized"
               :key="entry.name"
               lines="3"
               variant="outlined"
               class="py-0 px-3 mx-5 my-1"
               rounded="xl"
+              :class="{
+                'v-list-item--active text-primary':
+                  index === selectedItem && selectedList === 'categorized',
+              }"
+              @click="SelectCategory(index, 'categorized')"
             >
               <v-row>
                 <v-col cols="6"
@@ -183,6 +188,7 @@ export default {
     categorize: [],
     categorized: [],
     nothingToCategorize: false,
+    selectedList: null,
     selectedItem: null,
     selectedCategory: null,
     accountMatch: null,
@@ -194,7 +200,7 @@ export default {
     console.log("#{test}");
   },
   created() {
-    this.GetAccounts(["Exclude=Unrealized,Equity,Assets,Pnl,Tax"]);
+    this.GetAccountsForUI(["Exclude=Unrealized,Equity,Assets,Pnl,Tax"]);
     this.StartMapping();
   },
   watch: {
@@ -222,20 +228,25 @@ export default {
       this.accountMatch = Array.from(account_set[0]);
       console.log(account_set);
     },
-    SelectCategory(index) {
+    SelectCategory(index, clickedList) {
       this.selectedItem = index;
+      this.selectedList = clickedList;
       this.anyItemSelected = true;
     },
-    GetAccounts(filters) {
+    GetAccountsForUI(filters) {
       operations.GetAccounts(filters).then((response) => {
-        this.accounts = response;
+        this.accounts = response.sort();
       });
     },
     ApplyCategoryToItem() {
       //this.categorize.find((entry) => entry.name === this.selectedItem).add("category":this.selectedCategory )
-      this.categorize[this.selectedItem]["category"] = this.selectedCategory;
+
+      this[this.selectedList][this.selectedItem]["category"] =
+        this.selectedCategory;
       var move_entry_to_end = this.categorize.splice(this.selectedItem, 1);
-      this.categorized.unshift(move_entry_to_end.pop());
+      if (this.selectedList === "categorize") {
+        this.categorized.unshift(move_entry_to_end.pop());
+      }
 
       //reset for next-probably have more work to do.
       this.selectedCategory = null;

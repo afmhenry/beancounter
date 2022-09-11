@@ -2,7 +2,7 @@
   <v-app fill-height>
     <v-main>
       <NavBar @view="SelectView">
-        <v-container style="margin: 0px 10px">
+        <v-container style="margin: 0px 10px; max-width: 100%">
           <ImportModule v-if="this.view === 'Import'"></ImportModule>
 
           <HomeModule v-if="this.view === 'Home'"></HomeModule>

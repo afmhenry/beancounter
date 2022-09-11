@@ -32,7 +32,7 @@ class Importer(importer.ImporterProtocol):
         return 'Payslip.pdf'
 
     def file_account(self, _):
-        return self.income_account
+        return "documents/" + self.income_account
 
     def file_date(self, file):
         date_str = re.findall("[0-9]{2}.[0-9]{2}.[0-9]{4}", file.name)[0]

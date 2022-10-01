@@ -22,7 +22,7 @@ openpyxl==3.0.9
 packaging==21.3
 pluggy==1.0.0
 ply==3.11
-protobuf==3.19.1
+protobuf==3.19.5
 py==1.11.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

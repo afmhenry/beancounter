@@ -122,10 +122,21 @@ export default {
             element
               .filter((d) => d.date === e)
               .forEach((subElem) => {
-                amounts.push([
-                  subElem.date,
-                  parseInt(subElem.total.split(" ")[0]),
-                ]);
+                var spendOverPeriod = element.map((k) =>
+                  parseInt(k.total.split(" ")[0])
+                );
+                var sumOfSpend = 0;
+                spendOverPeriod.forEach((j) => (sumOfSpend += j));
+                var amount = parseInt(subElem.total.split(" ")[0]);
+                var avgPerMonth =
+                  Math.round(100 * (sumOfSpend / this.dateRange.length)) / 100;
+                amounts.push({
+                  category: subElem.date,
+                  y: amount,
+                  custom: {
+                    avg: avgPerMonth,
+                  },
+                });
               });
           }
 
@@ -162,9 +173,13 @@ export default {
           },
         },
       };
+      //https://api.highcharts.com/class-reference/Highcharts.Point#options
       this.chartOptions["tooltip"] = {
         headerFormat: "<b>{point.key}</b><br/>",
-        pointFormat: "{series.name}: {point.y}<br/>Total: {point.stackTotal}",
+        pointFormat: `{series.name}<br/>\
+          Spend:\t\t{point.y}<br/>\
+          Percent:\t{point.percentage:.1f}%<br/> \
+          Average:\t{point.custom.avg} kr`,
       };
       this.chartOptions.title = "Spending";
       Highcharts.chart("highcharts", this.chartOptions);

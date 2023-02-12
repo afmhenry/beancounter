@@ -85,26 +85,19 @@ export default {
     GetSpending(filters) {
       var date_range = new Array();
       var accounts = new Array();
-      var startDate;
-      var endDate;
       operations
         .GetSpending(["Include=Expenses", "Exclude=Tax", "Year=2021,2022,2023"])
         .then((response) => {
           for (var i in response) {
             var date = new Date(response[i].year, response[i].month, 0);
-            if (!startDate) startDate = date;
             var month = date.toLocaleString("default", { month: "long" });
             var y_label = month + " " + response[i].year;
-
             date_range.push(y_label);
             response[i]["date"] = y_label;
-
             accounts.push(response[i].account);
-            if (!response[i + 1]) endDate = date;
           }
 
           this.dateRange = [...new Set(date_range)];
-          console.log(this.dateRange);
           this.accounts = [...new Set(accounts)];
 
           for (var j in this.accounts) {
@@ -146,7 +139,6 @@ export default {
         });
         this.chartOptions.series[i].name = this.history[i][0].account;
         this.chartOptions.series[i].data = amounts;
-        //console.log(this.chartOptions);
       });
 
       this.chartOptions["xAxis"] = {

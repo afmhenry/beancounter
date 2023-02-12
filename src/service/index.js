@@ -155,7 +155,7 @@ const BqlHandler = {
                 break;
             case "hist":
                 //query = "select sum(position) as total, year, month <FILTER> group by year, month"
-                query = "SELECT year, month, account, sum(position) as total <FILTER> group by month, year, account "
+                query = "SELECT year, month, account, sum(position) as total <FILTER> group by year,month, account "
                 break;
         }
         return query;

@@ -86,16 +86,14 @@ export default {
       var date_range = new Array();
       var accounts = new Array();
       operations
-        .GetSpending(["Include=Expenses", "Exclude=Tax", "Year=2021,2022"])
+        .GetSpending(["Include=Expenses", "Exclude=Tax", "Year=2021,2022,2023"])
         .then((response) => {
           for (var i in response) {
             var date = new Date(response[i].year, response[i].month, 0);
             var month = date.toLocaleString("default", { month: "long" });
             var y_label = month + " " + response[i].year;
-
             date_range.push(y_label);
             response[i]["date"] = y_label;
-
             accounts.push(response[i].account);
           }
 
@@ -117,8 +115,20 @@ export default {
       //for each account
       this.history.forEach((element, i) => {
         amounts = [];
-        element.forEach((subElem) => {
-          amounts.push([subElem.date, parseInt(subElem.total.split(" ")[0])]);
+        this.dateRange.forEach((e) => {
+          if (element.filter((d) => d.date === e).length === 0) {
+            amounts.push([e, parseInt(0)]);
+          } else {
+            element
+              .filter((d) => d.date === e)
+              .forEach((subElem) => {
+                amounts.push([
+                  subElem.date,
+                  parseInt(subElem.total.split(" ")[0]),
+                ]);
+              });
+          }
+
           //amounts.push({"date": subElem.date, "value": parseInt(subElem.total.split(" ")[0])});
         });
         accounts.push(amounts);

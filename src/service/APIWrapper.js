@@ -3,7 +3,7 @@ import axios from "axios";
 
 const client = axios.create({
     baseURL: "http://localhost:5000",
-    timeout: 5000,
+    timeout: 10000,
 });
 
 const operations = {
@@ -11,7 +11,7 @@ const operations = {
     //invokes script file
     InvokeScript: async function (action) {
         const response = await client
-            .post(`/categorize/run/${action}`)
+            .post(`/run/${action}`)
             .then((result) => result.data);
         return response;
     },
@@ -19,7 +19,6 @@ const operations = {
     //Requests all accounts in the beancount file, 
     //Returns them in array
     GetAccounts: async function (params) {
-
         const response = await client
             .get(`/accounts${HandleParams(params)}`)
             .then((result) => result.data);

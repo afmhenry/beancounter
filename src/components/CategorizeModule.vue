@@ -23,6 +23,9 @@
     <v-row v-else-if="nothingToCategorize">
       <div style="text-align: center">
         <h3>Nothing left to categorize. Lets import!</h3>
+        <v-btn color="secondary" @click="SubmitNewTransactions"
+          >Import New Transactions</v-btn
+        >
         <br />
       </div>
     </v-row>
@@ -193,11 +196,10 @@ export default {
     selectedCategory: null,
     accountMatch: null,
     anyItemSelected: false,
+    searchString: null,
   }),
   beforeUpdate() {
-    //operations.GetAccounts();
     this.AccountHierarchy();
-    console.log("#{test}");
   },
   created() {
     this.GetAccountsForUI(["Exclude=Unrealized,Equity,Assets,Pnl,Tax"]);
@@ -206,7 +208,9 @@ export default {
   watch: {
     selectedCategory() {
       if (this.selectedCategory) this.ApplyCategoryToItem();
-      else this.anyItemSelected = null;
+      else {
+        this.anyItemSelected = false;
+      }
     },
   },
   methods: {
@@ -226,7 +230,6 @@ export default {
         account_set[2].add(this.accounts[i].account.split(":")[2]);
       }
       this.accountMatch = Array.from(account_set[0]);
-      console.log(account_set);
     },
     SelectCategory(index, clickedList) {
       this.selectedItem = index;
@@ -247,15 +250,34 @@ export default {
       if (this.selectedList === "categorize") {
         this.categorized.unshift(move_entry_to_end.pop());
       }
-
-      //reset for next-probably have more work to do.
-      this.selectedCategory = null;
-      this.selectedItem = null;
+      this.$nextTick(() => {
+        this.selectedItem = null;
+        this.searchString = null;
+        this.selectedCategory = null;
+      });
     },
     SubmitCategories() {
       operations.SendUpdatedCategories(this.categorized).then(() => {
         window.location.reload();
       });
+    },
+    async SubmitNewTransactions() {
+      const check = await operations.InvokeScript("check");
+      if (check.message === "success") {
+        const start = await operations.InvokeScript("start");
+        if (start.message === "success") {
+          const move = await operations.InvokeScript("move");
+          if (move.message === "success") {
+            console.log("Success");
+          } else {
+            console.log(move);
+          }
+        } else {
+          console.log(start);
+        }
+      } else {
+        console.log(check);
+      }
     },
   },
 };

@@ -49,9 +49,10 @@ app.post('/categorize/these', function (req, res) {
     res.send({ "status": "recieved" })
 });
 
-app.post('/categorize/run/*', function (req, res) {
-    CategoryHandler.SpawnChildProcess(req.path.split("/")[3], res);
+app.post('/run/*', function (req, res) {
+    CategoryHandler.SpawnChildProcess(req.path.split("/")[2], res);
 });
+
 app.post('/categorized', function (req, res) {
     CategoryHandler.UpdateJSONMapping(req.body, res)
 });
@@ -74,7 +75,7 @@ const exitfn = function () {
 process.on("SIGINT", exitfn);
 process.on("SIGTERM", exitfn);
 
-//dfancy timeout logic, so if it stalls, we get an error. 
+// fancy timeout logic, so if it stalls, we get an error. 
 function getAllCategories(timeout) {
 
     var start = Date.now();
@@ -246,31 +247,68 @@ const CategoryHandler = {
     SpawnChildProcess: (script, res) => {
         try {
             var script_process = spawn("./scripts/" + script + ".sh")
+            var result = ''
             console.log(script)
             script_process.on('error', (err) => {
                 console.error('Failed to start subprocess.', err);
             });
-
+            script_process.stdout.on("data", data => {
+                result += data
+            })
+            script_process.stderr.on("data", data => {
+                result += data
+            })
             //send when stdout is done
             script_process.stdout.on("close", data => {
 
                 //how do I want to handle output from the different scripts? 
                 //can i make this a more generic structure?
                 //probably can move this part out and do conditions on which script is invoked. 
-                getAllCategories(timeout).then(() => {
-                    res.send({
-                        "message": "success",
-                        "content": "categorize",
-                        "values": categorize
-                    })
-                    categorize = []
-                    return
-                }).catch(error => {
-                    console.error("Timeout on categorize", error)
-                    res.send(500, {
-                        "message": "failed",
-                    })
-                })
+                switch (script) {
+                    case "map":
+                        //no clue why this requires a file in the data folder. probably something to do with the script never being initialized, need to handle that case later. 
+                        getAllCategories(timeout).then(() => {
+                            res.send({
+                                "message": "success",
+                                "content": "categorize",
+                                "values": categorize
+                            })
+                            categorize = []
+                            return
+                        }).catch(error => {
+                            console.error("Timeout on categorize", error)
+                            res.send(500, {
+                                "message": "failed",
+                            })
+                        })
+                        break;
+                    case "check":
+                        res.send({
+                            "message": result ? "failed" : "success",
+                            "content": "check",
+                            "values": result
+                        })
+                        break
+                    case "start":
+                        res.send({
+                            "message": result ? "failed" : "success",
+                            "content": "start",
+                            "values": result
+                        })
+                        break;
+                    case "move":
+                        res.send({
+                            "message": result.includes("****") ? "success" : "failed",
+                            "content": "move",
+                            "values": result
+                        })
+                        break;
+
+                    default:
+                        break;
+                }
+
+
             });
 
         } catch (error) {

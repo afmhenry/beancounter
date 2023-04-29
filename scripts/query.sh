@@ -1,1 +1,1 @@
-bean-query -f=csv ../beans/alex.beancount "SELECT account, month, year, sum(position) as total where account ~ 'Expenses' group by month, year, account "
+bean-query -f=csv beans/alex.beancount "select account where not account ~'.*Unrealized.*' and not account ~'.*Equity.*' and not account ~'.*Assets.*' and not account ~'.*Pnl.*' and not account ~'.*Tax.*' group by account"
